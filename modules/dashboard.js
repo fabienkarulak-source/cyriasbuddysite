@@ -1,121 +1,86 @@
 /**
- * DASHBOARD MODULE
+ * DASHBOARD MODULE - Accueil
  */
 const DashboardModule = {
-  KEY: 'dashboard',
-  
-  async init() {
-    this.refresh();
-    
-    document.getElementById('dash-refresh')?.addEventListener('click', () => {
-      this.refresh();
-      Toast.success('Dashboard actualisé');
-    });
+    async init() {
+        this.renderBanner();
+        this.renderKPIs();
+        this.renderLinks();
+    },
 
-    // Date
-    const dateEl = document.getElementById('welcome-date');
-    if (dateEl) {
-      dateEl.textContent = new Date().toLocaleDateString('fr-FR', {
-        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-      });
-    }
-  },
+    destroy() {
+        // Rien de spécial à détruire ici (pas de graphes complexes)
+    },
 
-  refresh() {
-    // Stats Kanban
-    const kanban = Storage.get('kanban', { tasks: [] });
-    const tasks = kanban.tasks || [];
-    const activeTasks = tasks.filter(t => t.status !== 'done').length;
-    document.getElementById('stat-active-tasks').textContent = activeTasks;
-    document.getElementById('stat-tasks-trend').textContent = `${tasks.length} au total`;
+    renderBanner() {
+        const greetingEl = document.getElementById('home-greeting');
+        const userEl = document.getElementById('home-username');
+        const dateEl = document.getElementById('home-date');
+        
+        if (!greetingEl) return;
 
-    // Stats Timer
-    const sessions = Storage.get('timer_sessions', []);
-    const totalSec = sessions.reduce((sum, s) => sum + (s.duration || 0), 0);
-    const h = Math.floor(totalSec / 3600);
-    const m = Math.floor((totalSec % 3600) / 60);
-    document.getElementById('stat-time').textContent = `${h}h${String(m).padStart(2, '0')}`;
+        const h = new Date().getHours();
+        let greeting = 'Bonjour';
+        if (h < 6) greeting = 'Bonne fin de nuit';
+        else if (h >= 18) greeting = 'Bonsoir';
+        greetingEl.textContent = greeting;
 
-    // Stats Errors
-    const errors = Storage.get('errors', []);
-    const unresolved = errors.filter(e => !e.resolved).length;
-    document.getElementById('stat-errors').textContent = unresolved;
+        const username = Storage.get('username', 'Utilisateur');
+        userEl.textContent = username;
 
-    // Stats Journal
-    const journal = Storage.get('journal', []);
-    document.getElementById('stat-journal').textContent = journal.length;
+        const d = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        if (dateEl) dateEl.textContent = d.toLocaleDateString('fr-FR', options);
+    },
 
-    // Tâches récentes
-    const recentTasksEl = document.getElementById('recent-tasks');
-    if (recentTasksEl) {
-      const recent = tasks.slice(-5).reverse();
-      if (recent.length === 0) {
-        recentTasksEl.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">📭</div>
-            <div class="empty-state-text">Aucune tâche pour le moment</div>
-          </div>
-        `;
-      } else {
-        recentTasksEl.innerHTML = recent.map(t => `
-          <div style="padding:10px 12px;border-radius:6px;background:var(--bg-subtle);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
-            <div style="flex:1;min-width:0;">
-              <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${Utils.escape(t.title)}</div>
-              <div class="text-xs text-muted mt-2">${Utils.formatDate(t.createdAt)}</div>
-            </div>
-            <span class="badge ${this._statusBadge(t.status)}">${t.status || 'todo'}</span>
-          </div>
+    renderKPIs() {
+        // 1. Tickets Kanban
+        const tickets = Storage.get('kanban_tickets', []);
+        const openTickets = tickets.filter(t => t.statut !== 'closed').length;
+        const elTickets = document.getElementById('dash-tickets');
+        if (elTickets) elTickets.textContent = openTickets;
+
+        // 2. Jours CRA du mois
+        const craSources = Storage.get('cra_data_sources', {});
+        let joursMois = 0;
+        const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+        Object.values(craSources).forEach(src => {
+            if (src.data) {
+                src.data.forEach(d => {
+                    if (d.date && d.date.startsWith(currentMonth)) joursMois += parseFloat(d.jours || 0);
+                });
+            }
+        });
+        const elCra = document.getElementById('dash-cra');
+        if (elCra) elCra.textContent = joursMois.toFixed(1);
+
+        // 3. Tâches Organisator du jour
+        const tasks = Storage.get('tasks', []);
+        const todayStr = new Date().toISOString().split('T')[0];
+        const todayTasks = tasks.filter(t => !t.done && t.date === todayStr).length;
+        const elTasks = document.getElementById('dash-tasks');
+        if (elTasks) elTasks.textContent = todayTasks;
+    },
+
+    renderLinks() {
+        const container = document.getElementById('home-links-container');
+        if (!container) return;
+        
+        const links = Storage.get('links', { 'Favoris': [] });
+        const favoris = links['Favoris'] || [];
+
+        if (favoris.length === 0) {
+            container.innerHTML = '<div class="text-muted" style="font-size:13px;">Aucun favori. Ajoutez-en depuis la page "Tous les liens".</div>';
+            return;
+        }
+
+        container.innerHTML = favoris.map(link => `
+            <a href="${Utils.escape(link.url)}" target="_blank" rel="noopener noreferrer" class="link-card">
+                <div style="font-weight:700; color:var(--ink); margin-bottom:2px;">${Utils.escape(link.name)}</div>
+                <div style="font-size:10px; color:var(--ink-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${Utils.escape(link.url.replace('https://',''))}</div>
+            </a>
         `).join('');
-      }
     }
-
-    // Journal récent
-    const journalEl = document.getElementById('recent-journal');
-    if (journalEl) {
-      const recent = journal.slice(-5).reverse();
-      if (recent.length === 0) {
-        journalEl.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">📝</div>
-            <div class="empty-state-text">Aucune entrée dans le journal</div>
-          </div>
-        `;
-      } else {
-        journalEl.innerHTML = recent.map(j => `
-          <div style="padding:10px 12px;border-radius:6px;background:var(--bg-subtle);margin-bottom:6px;border-left:3px solid var(--brand);">
-            <div style="font-size:13px;font-weight:500;">${Utils.truncate(Utils.escape(j.content || j.title || ''), 80)}</div>
-            <div class="text-xs text-muted mt-2">${Utils.formatDateTime(j.date || j.createdAt)}</div>
-          </div>
-        `).join('');
-      }
-    }
-
-    // Stockage
-    const stats = Storage.getStats();
-    const storageEl = document.getElementById('storage-info');
-    if (storageEl) {
-      storageEl.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <span>Espace utilisé</span>
-          <strong>${stats.total}</strong>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span>Modules actifs</span>
-          <strong>${stats.moduleCount}</strong>
-        </div>
-      `;
-    }
-  },
-
-  _statusBadge(status) {
-    const map = {
-      'done': 'badge-ok',
-      'in-progress': 'badge-info',
-      'review': 'badge-warn',
-      'todo': ''
-    };
-    return map[status] || '';
-  }
 };
 
 window.DashboardModule = DashboardModule;
