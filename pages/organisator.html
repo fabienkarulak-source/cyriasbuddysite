@@ -1,8 +1,97 @@
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
-  <div>
-    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">📅 Organisator</h1>
-    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Planification et tâches quotidiennes</p>
-  </div>
-  <div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" id="org-new">+ Nouvelle tâche</button></div>
+<div id="page-organisator">
+    <div class="page-header">
+        <div>
+            <h1>📅 Organisator</h1>
+            <p>Gestionnaire de tâches avec timer Pomodoro intégré</p>
+        </div>
+    </div>
+    
+    <div class="org-container">
+        <div class="org-sidebar">
+            <div class="pomodoro-card">
+                <h3>⏱️ Focus Timer</h3>
+                <div id="timerDisplay">25:00</div>
+                <div class="timer-buttons">
+                    <button onclick="OrganisatorModule.startTimer()">Démarrer</button>
+                    <button onclick="OrganisatorModule.pauseTimer()">Pause</button>
+                    <button onclick="OrganisatorModule.resetTimer()">Réinitialiser</button>
+                </div>
+                <div class="timer-presets">
+                    <button onclick="OrganisatorModule.setTimer(10)">10m</button>
+                    <button onclick="OrganisatorModule.setTimer(25)">25m</button>
+                    <button onclick="OrganisatorModule.setTimer(50)">50m</button>
+                </div>
+                <div class="timer-custom">
+                    <input type="number" id="customTime" placeholder="Min perso" min="1" max="120">
+                    <button onclick="OrganisatorModule.setCustomTimer()">OK</button>
+                </div>
+            </div>
+
+            <div class="card p-4 mt-4">
+                <h3 class="card-title mb-4">📝 Nouvelle Tâche</h3>
+                <div class="form-group">
+                    <label class="label">Titre</label>
+                    <input type="text" id="taskInput" class="input" placeholder="Entrer le titre...">
+                </div>
+                <div class="form-group">
+                    <label class="label">Date</label>
+                    <input type="date" id="dateInput" class="input">
+                </div>
+                <div class="grid grid-2 gap-2">
+                    <div class="form-group">
+                        <label class="label">Priorité</label>
+                        <select id="priorityInput" class="select">
+                            <option value="urgent">🔴 Urgent</option>
+                            <option value="moyen" selected>🟡 Moyen</option>
+                            <option value="bas">🟢 Bas</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Type</label>
+                        <select id="typeInput" class="select">
+                            <option value="TMA">TMA</option>
+                            <option value="Formation">Formation</option>
+                            <option value="Réunion">Réunion</option>
+                            <option value="Autre" selected>Autre</option>
+                        </select>
+                    </div>
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2">
+                    <input type="checkbox" id="repeatInput">
+                    <span class="text-xs">Tâche récurrente (hebdo)</span>
+                </label>
+                <button class="btn btn-secondary w-full mt-4" onclick="OrganisatorModule.addTask()">Ajouter au planning</button>
+            </div>
+        </div>
+
+        <div class="org-content">
+            <div class="stat-grid">
+                <div class="stat">
+                    <div class="stat-value" id="stat-total">0</div>
+                    <div class="stat-label">Tâches total</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-done">0</div>
+                    <div class="stat-label">Complétées</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-percent">0%</div>
+                    <div class="stat-label">Progression</div>
+                </div>
+            </div>
+
+            <div class="card p-4 mb-4">
+                <h3 class="card-title mb-4">📊 Performance hebdomadaire</h3>
+                <div style="height: 250px; position: relative;">
+                    <canvas id="perfChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card p-4">
+                <h3 class="card-title mb-4">📋 Ma Liste</h3>
+                <div id="taskList" class="flex flex-col gap-2">
+                    </div>
+            </div>
+        </div>
+    </div>
 </div>
-<div class="grid grid-3" id="org-board"></div>
