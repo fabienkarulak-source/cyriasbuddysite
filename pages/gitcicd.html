@@ -1,0 +1,39 @@
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
+  <div>
+    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">🔀 Git & CI/CD</h1>
+    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Suivi des commits et déploiements</p>
+  </div>
+  <div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" id="git-new">+ Nouveau commit</button></div>
+</div>
+<div class="stat-grid">
+  <div class="stat">
+    <div class="stat-label">Commits</div>
+    <div class="stat-value" id="git-commits">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Pull Requests</div>
+    <div class="stat-value" id="git-prs">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Déploiements</div>
+    <div class="stat-value" id="git-deploys">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Builds échoués</div>
+    <div class="stat-value" id="git-failed" style="color:var(--danger);">0</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">📜 Timeline</h3>
+    <select class="select" id="git-filter" style="width:auto;">
+      <option value="">Tous types</option>
+      <option value="commit">Commits</option>
+      <option value="pr">Pull Requests</option>
+      <option value="deploy">Déploiements</option>
+      <option value="build">Builds</option>
+    </select>
+  </div>
+  <div id="git-list"></div>
+</div>

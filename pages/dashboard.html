@@ -1,0 +1,108 @@
+<!-- Bandeau d'accueil -->
+<div id="home-welcome-banner" style="margin-bottom: var(--space-5);">
+  <h1 style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:700;color:var(--primary);margin:0;letter-spacing:-0.5px;">
+    <span id="home-greeting">Bonjour</span> <span style="font-size:28px;">👋</span>
+  </h1>
+  <p id="welcome-date" style="font-size:13px;color:var(--ink-muted);margin-top:4px;text-transform:capitalize;"></p>
+</div>
+
+<!-- Welcome card -->
+<div class="welcome-card">
+  <h2>CYRIAS BUDDY</h2>
+  <p>Votre portail de gestion modulaire — Tableau de bord</p>
+</div>
+
+<!-- Statistiques rapides -->
+<h3 class="section-title">Vos indicateurs</h3>
+<div class="stat-grid">
+  <div class="stat">
+    <div class="stat-label">📋 Tâches actives</div>
+    <div class="stat-value" id="stat-active-tasks">0</div>
+    <div class="stat-trend" id="stat-tasks-trend">—</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">⏱ Temps tracké</div>
+    <div class="stat-value" id="stat-time">0h00</div>
+    <div class="stat-trend">cette semaine</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">⚠️ Erreurs</div>
+    <div class="stat-value" id="stat-errors">0</div>
+    <div class="stat-trend">à résoudre</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">📓 Entrées journal</div>
+    <div class="stat-value" id="stat-journal">0</div>
+    <div class="stat-trend">total</div>
+  </div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h3 class="card-title">🎯 Tâches récentes</h3>
+        <div class="card-subtitle">Vos dernières tâches Kanban</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="Router.navigate('kanban')">Voir tout →</button>
+    </div>
+    <div id="recent-tasks" style="padding:var(--space-4);">
+      <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <div class="empty-state-text">Aucune tâche pour le moment</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h3 class="card-title">📓 Activité récente</h3>
+        <div class="card-subtitle">Vos dernières entrées</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="Router.navigate('journal')">Voir tout →</button>
+    </div>
+    <div id="recent-journal" style="padding:var(--space-4);">
+      <div class="empty-state">
+        <div class="empty-state-icon">📝</div>
+        <div class="empty-state-text">Aucune entrée dans le journal</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Accès rapides -->
+<h3 class="section-title" style="margin-top:var(--space-5);">Accès rapides</h3>
+<div class="content-grid">
+  <div class="link-card" onclick="Router.navigate('kanban')">
+    <div style="font-size:24px;margin-bottom:8px;">🎯</div>
+    <div style="font-size:14px;font-weight:600;color:var(--primary);">Kanban &amp; MEP</div>
+    <div style="font-size:12px;color:var(--ink-muted);margin-top:4px;">Gérer vos tâches et déploiements</div>
+  </div>
+  <div class="link-card" onclick="Router.navigate('craminator')">
+    <div style="font-size:24px;margin-bottom:8px;">📊</div>
+    <div style="font-size:14px;font-weight:600;color:var(--primary);">CRAminator</div>
+    <div style="font-size:12px;color:var(--ink-muted);margin-top:4px;">Analyser et gérer vos CRA</div>
+  </div>
+  <div class="link-card" onclick="Router.navigate('sql')">
+    <div style="font-size:24px;margin-bottom:8px;">🗄️</div>
+    <div style="font-size:14px;font-weight:600;color:var(--primary);">SQL Generator</div>
+    <div style="font-size:12px;color:var(--ink-muted);margin-top:4px;">Générer des requêtes SQL</div>
+  </div>
+  <div class="link-card" onclick="Router.navigate('snippets')">
+    <div style="font-size:24px;margin-bottom:8px;">💻</div>
+    <div style="font-size:14px;font-weight:600;color:var(--primary);">Snippetator</div>
+    <div style="font-size:12px;color:var(--ink-muted);margin-top:4px;">Votre bibliothèque de code</div>
+  </div>
+</div>
+
+<!-- Stockage -->
+<div class="card" style="margin-top:var(--space-5);">
+  <div class="card-header">
+    <h3 class="card-title">💾 État du stockage</h3>
+    <button class="btn btn-ghost btn-sm" id="dash-refresh">🔄 Actualiser</button>
+  </div>
+  <div style="padding:var(--space-4);">
+    <div id="storage-info" class="text-sm text-muted">Chargement…</div>
+  </div>
+</div>

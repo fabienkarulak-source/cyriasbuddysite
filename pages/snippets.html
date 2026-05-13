@@ -1,0 +1,24 @@
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
+  <div>
+    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">💻 Snippetator</h1>
+    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Votre bibliothèque de code</p>
+  </div>
+  <div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" id="snip-new">+ Nouveau snippet</button></div>
+</div>
+<div class="card mb-4" style="padding:12px;">
+  <div style="display:flex;gap:12px;align-items:center;">
+    <input class="input" id="snip-search" placeholder="🔍 Rechercher..." style="flex:1;">
+    <select class="select" id="snip-lang-filter" style="width:auto;">
+      <option value="">Tous langages</option>
+      <option value="javascript">JavaScript</option>
+      <option value="python">Python</option>
+      <option value="sql">SQL</option>
+      <option value="html">HTML</option>
+      <option value="css">CSS</option>
+      <option value="bash">Bash</option>
+      <option value="other">Autre</option>
+    </select>
+  </div>
+</div>
+
+<div id="snip-list" class="grid grid-2"></div>

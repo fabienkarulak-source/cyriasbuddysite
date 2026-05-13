@@ -1,0 +1,82 @@
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
+  <div>
+    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">⚙️ Configuration</h1>
+    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Paramètres de l'application</p>
+  </div>
+  <div style="display:flex;gap:8px;"></div>
+</div>
+<div class="grid grid-2">
+  <!-- Préférences -->
+  <div class="card">
+    <h3 class="card-title mb-4">🎨 Apparence</h3>
+    
+    <div class="form-group">
+      <label class="label">Thème</label>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline" id="theme-light">☀️ Clair</button>
+        <button class="btn btn-outline" id="theme-dark">🌙 Sombre</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="label">Langue</label>
+      <select class="select" id="cfg-lang">
+        <option value="fr">Français</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Profil -->
+  <div class="card">
+    <h3 class="card-title mb-4">👤 Profil utilisateur</h3>
+    <div class="form-group">
+      <label class="label">Nom</label>
+      <input class="input" id="cfg-name" placeholder="Votre nom">
+    </div>
+    <div class="form-group">
+      <label class="label">Email</label>
+      <input class="input" id="cfg-email" type="email" placeholder="vous@example.com">
+    </div>
+    <div class="form-group">
+      <label class="label">Société</label>
+      <input class="input" id="cfg-company" placeholder="Votre société">
+    </div>
+    <div class="form-group">
+      <label class="label">TJM par défaut (€)</label>
+      <input class="input" id="cfg-tjm" type="number" placeholder="500">
+    </div>
+    <button class="btn btn-primary" id="cfg-save">💾 Enregistrer</button>
+  </div>
+
+  <!-- Données -->
+  <div class="card">
+    <h3 class="card-title mb-4">💾 Gestion des données</h3>
+    <div class="text-sm text-muted mb-4">Toutes vos données sont stockées localement dans votre navigateur.</div>
+    
+    <div id="cfg-storage-stats" class="mb-4"></div>
+    
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button class="btn btn-outline" id="cfg-export">📥 Exporter toutes les données</button>
+      <button class="btn btn-outline" id="cfg-import">📤 Importer des données</button>
+      <button class="btn btn-danger" id="cfg-reset">🗑 Tout effacer</button>
+    </div>
+  </div>
+
+  <!-- Info -->
+  <div class="card">
+    <h3 class="card-title mb-4">ℹ️ À propos</h3>
+    <div class="text-sm" style="line-height:1.8;">
+      <div><strong>Cyrias Buddy</strong></div>
+      <div class="text-muted">Portail modulaire de gestion</div>
+      <div>Version: <strong>1.0</strong></div>
+      <div>Architecture: SPA modulaire</div>
+      <div>Stockage: localStorage</div>
+    </div>
+    
+    <div class="mt-4">
+      <strong class="text-sm">Modules actifs:</strong>
+      <div class="text-xs text-muted mt-2" id="cfg-modules"></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
+  <div>
+    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">📊 CRAminator</h1>
+    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Analyse et gestion des CRA</p>
+  </div>
+  <div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" id="cra-export">📥 Exporter</button><button class="btn btn-primary btn-sm" id="cra-new">📤 Importer CRA</button></div>
+</div>
+<div class="stat-grid">
+  <div class="stat">
+    <div class="stat-label">CRAs ce mois</div>
+    <div class="stat-value" id="cra-month">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Jours facturés</div>
+    <div class="stat-value" id="cra-days">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Total CA</div>
+    <div class="stat-value" id="cra-ca">0 €</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Taux moyen</div>
+    <div class="stat-value" id="cra-tjm">0 €</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Tous les CRAs</h3>
+    <div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" id="cra-export">📥 Exporter</button>
+      <select class="select" id="cra-filter-month" style="width:auto;">
+        <option value="">Tous mois</option>
+      </select>
+      <select class="select" id="cra-filter-client" style="width:auto;">
+        <option value="">Tous clients</option>
+      </select>
+    </div>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Client</th>
+        <th>Projet</th>
+        <th>Jours</th>
+        <th>TJM</th>
+        <th>Total</th>
+        <th>Statut</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="cra-tbody"></tbody>
+  </table>
+</div>

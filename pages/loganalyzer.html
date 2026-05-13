@@ -1,0 +1,31 @@
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
+  <div>
+    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">📄 LOG Analyzor</h1>
+    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Analyse de logs</p>
+  </div>
+  <div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" id="log-clear">🧹 Effacer</button></div>
+</div>
+<div class="grid" style="grid-template-columns: 1fr 1fr; gap:16px;">
+  <div class="card">
+    <h3 class="card-title mb-4">📥 Entrée</h3>
+    <div class="form-group">
+      <label class="label">Collez vos logs ou importez un fichier</label>
+      <textarea class="textarea" id="log-input" rows="14" style="font-family:var(--font-mono);font-size:11px;" placeholder="2024-01-15 10:32:01 INFO Server started&#10;2024-01-15 10:32:05 ERROR Connection failed..."></textarea>
+    </div>
+    <div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" id="log-clear">🧹 Effacer</button>
+      <button class="btn btn-outline btn-sm" id="log-import">📤 Importer fichier</button>
+      <button class="btn btn-primary btn-sm" id="log-analyze">⚡ Analyser</button>
+    </div>
+  </div>
+  
+  <div class="card">
+    <h3 class="card-title mb-4">📊 Résultats</h3>
+    <div id="log-stats" class="stat-grid" style="grid-template-columns:1fr 1fr;margin-bottom:16px;"></div>
+    <div id="log-results"></div>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <h3 class="card-title mb-4">📋 Logs parsés</h3>
+  <div id="log-parsed" style="max-height:400px;overflow:auto;"></div>
+</div>

@@ -1,0 +1,70 @@
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
+  <div>
+    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">🗄️ SQL Generator</h1>
+    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Générateur de requêtes SQL</p>
+  </div>
+  <div style="display:flex;gap:8px;"></div>
+</div>
+<div class="grid" style="grid-template-columns: 1fr 1fr; gap:16px;">
+  <!-- Form -->
+  <div class="card">
+    <h3 class="card-title mb-4">Configuration</h3>
+    
+    <div class="form-group">
+      <label class="label">Type de requête</label>
+      <select class="select" id="sql-type">
+        <option value="select">SELECT</option>
+        <option value="insert">INSERT</option>
+        <option value="update">UPDATE</option>
+        <option value="delete">DELETE</option>
+        <option value="create">CREATE TABLE</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="label">Table *</label>
+      <input class="input" id="sql-table" placeholder="users" required>
+    </div>
+
+    <div class="form-group" id="fields-group">
+      <label class="label">Champs (séparés par virgules)</label>
+      <input class="input" id="sql-fields" placeholder="id, name, email">
+    </div>
+
+    <div class="form-group" id="where-group">
+      <label class="label">Condition WHERE</label>
+      <input class="input" id="sql-where" placeholder="id = 1">
+    </div>
+
+    <div class="form-group" id="values-group" style="display:none;">
+      <label class="label">Valeurs (format key=value, séparées par virgules)</label>
+      <input class="input" id="sql-values" placeholder="name='John', email='john@example.com'">
+    </div>
+
+    <div class="form-group">
+      <label class="label">Limite</label>
+      <input class="input" id="sql-limit" type="number" placeholder="100">
+    </div>
+
+    <button class="btn btn-primary w-full" id="sql-generate">⚡ Générer SQL</button>
+  </div>
+
+  <!-- Output -->
+  <div class="card">
+    <h3 class="card-title mb-4">Requête générée</h3>
+    <pre id="sql-output" style="background:var(--bg-subtle);padding:16px;border-radius:var(--radius);font-family:var(--font-mono);font-size:13px;white-space:pre-wrap;word-break:break-all;color:var(--ink);min-height:200px;overflow:auto;">-- Configurez et cliquez sur "Générer SQL"</pre>
+    <div class="mt-4" style="display:flex;gap:8px;">
+      <button class="btn btn-outline btn-sm" id="sql-copy">📋 Copier</button>
+      <button class="btn btn-outline btn-sm" id="sql-save">💾 Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<!-- Historique -->
+<div class="card mt-4">
+  <div class="card-header">
+    <h3 class="card-title">📜 Historique</h3>
+    <button class="btn btn-ghost btn-sm" id="sql-clear-history">Effacer</button>
+  </div>
+  <div id="sql-history"></div>
+</div>

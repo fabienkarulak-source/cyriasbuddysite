@@ -1,0 +1,130 @@
+<div class="page-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
+  <div>
+    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">🎯 Kanban & MEP</h1>
+    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Gérez vos tâches en mode Kanban</p>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <button class="btn btn-outline btn-sm" id="kanban-export">📥 Exporter</button>
+    <button class="btn btn-outline btn-sm" id="kanban-import">📤 Importer</button>
+    <button class="btn btn-primary btn-sm" id="kanban-new-task">+ Nouvelle tâche</button>
+  </div>
+</div>
+<!-- Stats -->
+<div class="stat-grid">
+  <div class="stat">
+    <div class="stat-label">Total</div>
+    <div class="stat-value" id="kb-total">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">À faire</div>
+    <div class="stat-value" id="kb-todo" style="color:var(--ink-muted);">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">En cours</div>
+    <div class="stat-value" id="kb-doing" style="color:var(--info-fg);">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Terminées</div>
+    <div class="stat-value" id="kb-done" style="color:var(--ok-fg);">0</div>
+  </div>
+</div>
+
+<!-- Filtres -->
+<div class="card mb-4" style="padding:12px 16px;">
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+    <input class="input" id="kb-search" placeholder="🔍 Rechercher..." style="flex:1;min-width:200px;">
+    <select class="select" id="kb-filter-priority" style="width:auto;">
+      <option value="">Toutes priorités</option>
+      <option value="high">🔴 Haute</option>
+      <option value="medium">🟡 Moyenne</option>
+      <option value="low">🟢 Basse</option>
+    </select>
+    <select class="select" id="kb-filter-assignee" style="width:auto;">
+      <option value="">Tous assignés</option>
+    </select>
+  </div>
+</div>
+
+<!-- Tableau Kanban -->
+<div class="kanban-board" id="kanban-board" style="display:grid;grid-template-columns:repeat(4, 1fr);gap:16px;min-height:500px;">
+  <!-- Colonnes générées dynamiquement -->
+</div>
+
+<style>
+  .kanban-col {
+    background: var(--bg-subtle);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 200px;
+  }
+  .kanban-col-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 6px;
+    margin-bottom: 6px;
+  }
+  .kanban-col-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .kanban-col-count {
+    background: var(--surface);
+    color: var(--ink-muted);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+  }
+  .kanban-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: var(--shadow-sm);
+  }
+  .kanban-card:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+    border-color: var(--brand);
+  }
+  .kanban-card.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+  }
+  .kanban-card-title {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+  .kanban-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--ink-muted);
+  }
+  .kanban-card-priority {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .priority-high { background: var(--danger); }
+  .priority-medium { background: var(--warn); }
+  .priority-low { background: var(--ok); }
+  .kanban-col.drag-over {
+    background: var(--brand-soft);
+    border: 2px dashed var(--brand);
+  }
+  @media (max-width: 768px) {
+    .kanban-board { grid-template-columns: 1fr !important; }
+  }
+</style>

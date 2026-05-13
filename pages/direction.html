@@ -1,0 +1,27 @@
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
+  <div>
+    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">📈 Board Direction</h1>
+    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Pilotage et suivi des projets</p>
+  </div>
+  <div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" id="dir-new">+ Nouveau projet</button></div>
+</div>
+<div class="stat-grid">
+  <div class="stat">
+    <div class="stat-label">Projets actifs</div>
+    <div class="stat-value" id="dir-active">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">En retard</div>
+    <div class="stat-value" id="dir-late" style="color:var(--danger);">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Budget total</div>
+    <div class="stat-value" id="dir-budget">0 €</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Avancement moyen</div>
+    <div class="stat-value" id="dir-progress">0%</div>
+  </div>
+</div>
+
+<div id="dir-list" class="grid grid-2"></div>

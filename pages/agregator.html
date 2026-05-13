@@ -1,0 +1,26 @@
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
+  <div>
+    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">📚 Stafiz Agregator</h1>
+    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Agrégation de données</p>
+  </div>
+  <div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" id="agr-new">+ Nouvelle source</button></div>
+</div>
+<div class="stat-grid">
+  <div class="stat">
+    <div class="stat-label">Sources</div>
+    <div class="stat-value" id="agr-sources">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Données agrégées</div>
+    <div class="stat-value" id="agr-records">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Dernière sync</div>
+    <div class="stat-value" id="agr-last" style="font-size:14px;">—</div>
+  </div>
+</div>
+
+<div class="card">
+  <h3 class="card-title mb-4">Sources de données</h3>
+  <div id="agr-list"></div>
+</div>

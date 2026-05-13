@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checklist TNR Manuelle - Cyrias Buddy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    body { padding: 20px; max-width: 1100px; margin: 0 auto; }
+    .checklist-header {
+      background: linear-gradient(135deg, #5EB091 0%, #1B3B5C 100%);
+      color: white;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      margin-bottom: 24px;
+    }
+    .checklist-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .checklist-section-header {
+      padding: 14px 18px;
+      background: var(--bg-subtle);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .checklist-section-header:hover { background: var(--surface-hover); }
+    .checklist-section-title {
+      font-weight: 600;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .checklist-progress {
+      font-size: 12px;
+      padding: 4px 10px;
+      background: var(--surface);
+      border-radius: var(--radius-pill);
+      font-weight: 600;
+    }
+    .checklist-section.complete .checklist-progress {
+      background: var(--ok-soft);
+      color: var(--ok-fg);
+    }
+    .checklist-items {
+      padding: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s;
+    }
+    .checklist-section.open .checklist-items {
+      max-height: 3000px;
+      padding: 8px 0;
+    }
+    .checklist-item {
+      padding: 10px 18px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--divider);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .checklist-item:hover { background: var(--bg-subtle); }
+    .checklist-item:last-child { border-bottom: none; }
+    .checklist-item.checked {
+      background: rgba(34, 197, 94, 0.05);
+    }
+    .checklist-item.failed {
+      background: rgba(239, 68, 68, 0.05);
+    }
+    .checklist-checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-strong);
+      border-radius: 4px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: var(--surface);
+    }
+    .checklist-item.checked .checklist-checkbox {
+      background: var(--ok);
+      border-color: var(--ok);
+      color: white;
+    }
+    .checklist-item.failed .checklist-checkbox {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: white;
+    }
+    .checklist-content { flex: 1; }
+    .checklist-title { font-size: 13px; font-weight: 500; }
+    .checklist-item.checked .checklist-title { text-decoration: line-through; opacity: 0.7; }
+    .checklist-desc { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
+    .checklist-actions {
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .checklist-item:hover .checklist-actions { opacity: 1; }
+    .checklist-mini-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .checklist-mini-btn:hover { background: var(--bg-subtle); }
+    .checklist-summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: center;
+    }
+    .summary-value { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+    .summary-label { font-size: 11px; text-transform: uppercase; color: var(--ink-muted); }
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .global-progress {
+      height: 8px;
+      background: var(--bg-subtle);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .global-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand), #4A9076);
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+
+<div class="checklist-header">
+  <h1 style="font-size:28px;margin-bottom:4px;">📋 Checklist TNR Manuelle</h1>
+  <p style="opacity:0.9;">Validation manuelle de l'UI/UX du portail Cyrias Buddy</p>
+</div>
+
+<div class="controls">
+  <button class="btn btn-primary" id="btn-expand-all">📂 Tout déplier</button>
+  <button class="btn btn-outline" id="btn-collapse-all">📁 Tout replier</button>
+  <button class="btn btn-outline" id="btn-reset">🔄 Réinitialiser</button>
+  <button class="btn btn-outline" id="btn-auto">🧪 Tests auto</button>
+  <button class="btn btn-outline" id="btn-back">← Retour</button>
+  <button class="btn btn-outline" id="btn-export">📥 Exporter rapport</button>
+</div>
+
+<div class="checklist-summary">
+  <div class="summary-card">
+    <div class="summary-value" id="sum-total">0</div>
+    <div class="summary-label">Total</div>
+  </div>
+  <div class="summary-card">
+    <div class="summary-value" id="sum-passed" style="color:var(--ok-fg);">0</div>
+    <div class="summary-label">Validés</div>
+  </div>
+  <div class="summary-card">
+    <div class="summary-value" id="sum-failed" style="color:var(--danger);">0</div>
+    <div class="summary-label">Échoués</div>
+  </div>
+  <div class="summary-card">
+    <div class="summary-value" id="sum-pending" style="color:var(--warn);">0</div>
+    <div class="summary-label">En attente</div>
+  </div>
+</div>
+
+<div class="global-progress">
+  <div class="global-progress-fill" id="global-progress" style="width:0%"></div>
+</div>
+
+<div id="checklist-container"></div>
+
+<script>
+// ===== DÉFINITION DE LA CHECKLIST =====
+const CHECKLIST = [
+  {
+    id: 'navigation',
+    title: '🧭 Navigation',
+    items: [
+      { id: 'nav-sidebar', title: 'La sidebar affiche les 5 sections (Personnel, Projet, Outils, Analytics, Système)' },
+      { id: 'nav-routes', title: '20 liens de navigation visibles dans la sidebar' },
+      { id: 'nav-click', title: 'Cliquer sur un module charge la page correspondante' },
+      { id: 'nav-active', title: 'Le module actif est mis en évidence en vert' },
+      { id: 'nav-url', title: 'L\'URL change avec le hash (ex: #/kanban)' },
+      { id: 'nav-back', title: 'Le bouton "retour" du navigateur fonctionne' },
+      { id: 'nav-reload', title: 'Recharger la page conserve le module en cours' }
+    ]
+  },
+  {
+    id: 'global',
+    title: '🌐 Fonctions globales',
+    items: [
+      { id: 'glob-theme', title: 'Le bouton 🌙/☀️ bascule entre thème clair et sombre' },
+      { id: 'glob-theme-save', title: 'Le thème est conservé après rechargement' },
+      { id: 'glob-export', title: 'Le bouton 💾 propose le téléchargement d\'un JSON' },
+      { id: 'glob-import', title: 'Le bouton 📥 propose l\'import d\'un JSON' },
+      { id: 'glob-topbar', title: 'Le titre dans la topbar s\'adapte au module' }
+    ]
+  },
+  {
+    id: 'dashboard',
+    title: '🏠 Dashboard',
+    items: [
+      { id: 'dash-stats', title: 'Les 4 statistiques s\'affichent (Tâches, Temps, Erreurs, Journal)' },
+      { id: 'dash-date', title: 'La date du jour est affichée en français' },
+      { id: 'dash-recent', title: 'Les tâches et entrées récentes s\'affichent' },
+      { id: 'dash-quick', title: 'Les boutons d\'accès rapides naviguent vers les bons modules' },
+      { id: 'dash-storage', title: 'Les informations de stockage sont visibles' },
+      { id: 'dash-refresh', title: 'Le bouton 🔄 actualise les statistiques' }
+    ]
+  },
+  {
+    id: 'kanban',
+    title: '🎯 Kanban & MEP',
+    items: [
+      { id: 'kb-cols', title: '4 colonnes visibles (À faire, En cours, En revue, Terminé)' },
+      { id: 'kb-create', title: 'Le bouton "+ Nouvelle tâche" ouvre un modal' },
+      { id: 'kb-form', title: 'Le formulaire contient titre, description, statut, priorité, assigné, échéance' },
+      { id: 'kb-save', title: 'Créer une tâche l\'affiche dans la bonne colonne' },
+      { id: 'kb-edit', title: 'Cliquer sur une carte ouvre le formulaire d\'édition' },
+      { id: 'kb-delete', title: 'Le bouton supprimer affiche une confirmation' },
+      { id: 'kb-drag', title: 'Drag & drop : déplacer une carte change son statut' },
+      { id: 'kb-stats', title: 'Les statistiques (Total, À faire, En cours, Terminées) se mettent à jour' },
+      { id: 'kb-search', title: 'La recherche filtre les cartes' },
+      { id: 'kb-priority', title: 'Le filtre par priorité fonctionne' },
+      { id: 'kb-export', title: 'Le bouton "Exporter" télécharge un JSON' },
+      { id: 'kb-persist', title: 'Les tâches sont conservées après rechargement' }
+    ]
+  },
+  {
+    id: 'journal',
+    title: '📓 Journal',
+    items: [
+      { id: 'j-create', title: 'Créer une nouvelle entrée fonctionne' },
+      { id: 'j-tags', title: 'Les tags séparés par virgules sont reconnus' },
+      { id: 'j-display', title: 'Les entrées s\'affichent avec date et tags' },
+      { id: 'j-filter-tag', title: 'Cliquer sur un tag filtre les entrées' },
+      { id: 'j-search', title: 'La recherche filtre les entrées' },
+      { id: 'j-edit', title: 'Cliquer sur une entrée permet de l\'éditer' },
+      { id: 'j-delete', title: 'La suppression demande confirmation' },
+      { id: 'j-stats', title: 'Les statistiques (Total, Cette semaine) sont correctes' }
+    ]
+  },
+  {
+    id: 'links',
+    title: '🔗 Tous les liens',
+    items: [
+      { id: 'lk-default', title: 'Des liens par défaut sont créés au 1er lancement' },
+      { id: 'lk-categories', title: 'Les liens sont groupés par catégorie' },
+      { id: 'lk-add', title: 'Ajouter un nouveau lien fonctionne' },
+      { id: 'lk-click', title: 'Cliquer sur un lien l\'ouvre dans un nouvel onglet' },
+      { id: 'lk-search', title: 'La recherche filtre les liens' },
+      { id: 'lk-edit', title: 'Modifier un lien sauvegarde les changements' },
+      { id: 'lk-delete', title: 'Supprimer un lien demande confirmation' }
+    ]
+  },
+  {
+    id: 'organisator',
+    title: '📅 Organisator',
+    items: [
+      { id: 'org-3cols', title: '3 colonnes visibles (Aujourd\'hui, Demain, Plus tard)' },
+      { id: 'org-create', title: 'Créer une tâche fonctionne' },
+      { id: 'org-date', title: 'La date d\'échéance répartit la tâche dans la bonne colonne' },
+      { id: 'org-toggle', title: 'La checkbox marque la tâche comme terminée' },
+      { id: 'org-done', title: 'Les tâches terminées sont dans la section dédiée' }
+    ]
+  },
+  {
+    id: 'notif',
+    title: '🔔 Notifications',
+    items: [
+      { id: 'no-stats', title: '3 statistiques (Total, Non lues, Importantes)' },
+      { id: 'no-display', title: 'Les notifications s\'affichent avec icône et couleur selon type' },
+      { id: 'no-read', title: 'Marquer comme lu fonctionne' },
+      { id: 'no-mark-all', title: 'Le bouton "Tout marquer lu" fonctionne' },
+      { id: 'no-clear', title: 'Le bouton "Tout effacer" demande confirmation' }
+    ]
+  },
+  {
+    id: 'communicator',
+    title: '✉️ Communicator',
+    items: [
+      { id: 'co-default', title: 'Des modèles par défaut sont créés' },
+      { id: 'co-create', title: 'Créer un nouveau modèle fonctionne (titre, sujet, corps, catégorie)' },
+      { id: 'co-copy', title: 'Le bouton 📋 copie le modèle dans le presse-papier' },
+      { id: 'co-search', title: 'La recherche filtre les modèles' },
+      { id: 'co-edit', title: 'Modifier un modèle sauvegarde les changements' }
+    ]
+  },
+  {
+    id: 'direction',
+    title: '📈 Board Direction',
+    items: [
+      { id: 'di-stats', title: '4 statistiques affichées (Actifs, Retard, Budget, Avancement)' },
+      { id: 'di-create', title: 'Créer un projet fonctionne avec tous les champs' },
+      { id: 'di-progress', title: 'La barre d\'avancement reflète le pourcentage' },
+      { id: 'di-late', title: 'Les projets en retard sont marqués "⏰ En retard"' },
+      { id: 'di-status', title: 'Les statuts (Actif, En pause, etc.) s\'affichent en badge' }
+    ]
+  },
+  {
+    id: 'craminator',
+    title: '📊 CRAminator',
+    items: [
+      { id: 'cra-create', title: 'Créer un CRA fonctionne' },
+      { id: 'cra-calc', title: 'Le total (Jours × TJM) est correctement calculé' },
+      { id: 'cra-stats', title: 'Les stats (CRAs/mois, jours, CA, TJM moyen) sont correctes' },
+      { id: 'cra-filter-month', title: 'Le filtre par mois fonctionne' },
+      { id: 'cra-filter-client', title: 'Le filtre par client fonctionne' },
+      { id: 'cra-status', title: 'Le statut (Brouillon/Envoyé/Validé/Payé) s\'affiche en badge' },
+      { id: 'cra-export', title: 'L\'export CSV fonctionne (fichier téléchargeable)' }
+    ]
+  },
+  {
+    id: 'facturator',
+    title: '🧾 Facturator',
+    items: [
+      { id: 'fa-create', title: 'Créer une facture fonctionne' },
+      { id: 'fa-number', title: 'Un n° de facture est généré automatiquement (F-YYYY-NNNN)' },
+      { id: 'fa-tva', title: 'Le calcul HT → TTC est automatique selon le taux TVA' },
+      { id: 'fa-stats', title: 'Les statistiques (Total, Montant, En attente, Payées) sont correctes' },
+      { id: 'fa-status', title: 'Les statuts s\'affichent en badge coloré' }
+    ]
+  },
+  {
+    id: 'agregator',
+    title: '📚 Stafiz Agregator',
+    items: [
+      { id: 'ag-source', title: 'Créer une nouvelle source fonctionne' },
+      { id: 'ag-import', title: 'L\'import de fichier JSON/CSV fonctionne' },
+      { id: 'ag-view', title: 'Le bouton 👁 affiche les données de la source' },
+      { id: 'ag-stats', title: 'Les statistiques (Sources, Records, Dernière sync) sont correctes' }
+    ]
+  },
+  {
+    id: 'snippets',
+    title: '💻 Snippetator',
+    items: [
+      { id: 'sn-create', title: 'Créer un snippet fonctionne' },
+      { id: 'sn-langs', title: 'Plusieurs langages disponibles (JS, Python, SQL, HTML, CSS, Bash)' },
+      { id: 'sn-tags', title: 'Les tags sont supportés' },
+      { id: 'sn-copy', title: 'Le bouton 📋 copie le code' },
+      { id: 'sn-search', title: 'La recherche cherche dans titre et code' },
+      { id: 'sn-filter', title: 'Le filtre par langage fonctionne' },
+      { id: 'sn-monospace', title: 'Le code est affiché en police monospace' }
+    ]
+  },
+  {
+    id: 'sql',
+    title: '🗄️ SQL Generator',
+    items: [
+      { id: 'sq-types', title: '5 types de requêtes (SELECT, INSERT, UPDATE, DELETE, CREATE)' },
+      { id: 'sq-form', title: 'Le formulaire s\'adapte selon le type sélectionné' },
+      { id: 'sq-generate', title: 'Le bouton "Générer" produit un SQL valide' },
+      { id: 'sq-copy', title: 'Le bouton 📋 copie le SQL' },
+      { id: 'sq-save', title: 'Sauvegarder une requête l\'ajoute à l\'historique' },
+      { id: 'sq-history', title: 'L\'historique permet de recharger une requête' }
+    ]
+  },
+  {
+    id: 'loganalyzer',
+    title: '📄 Log Analyzer',
+    items: [
+      { id: 'lo-input', title: 'Coller des logs et cliquer "Analyser" fonctionne' },
+      { id: 'lo-parse', title: 'Les niveaux (ERROR, WARN, INFO, DEBUG) sont reconnus' },
+      { id: 'lo-stats', title: 'Les statistiques par niveau s\'affichent' },
+      { id: 'lo-errors', title: 'Les erreurs sont mises en évidence' },
+      { id: 'lo-import', title: 'L\'import de fichier .log/.txt fonctionne' }
+    ]
+  },
+  {
+    id: 'xmlviewer',
+    title: '</> XML Viewer',
+    items: [
+      { id: 'xm-format', title: 'Coller du XML et cliquer "Formater" affiche l\'arbre' },
+      { id: 'xm-syntax', title: 'La coloration syntaxique fonctionne (tags, attributs)' },
+      { id: 'xm-invalid', title: 'Un XML invalide affiche un message d\'erreur' },
+      { id: 'xm-import', title: 'L\'import de fichier .xml fonctionne' },
+      { id: 'xm-copy', title: 'Le bouton "Copier" fonctionne' }
+    ]
+  },
+  {
+    id: 'bible',
+    title: '📖 TMA Formator (Bible)',
+    items: [
+      { id: 'bi-create', title: 'Créer un article fonctionne' },
+      { id: 'bi-categories', title: 'Les catégories sont listées dans la sidebar' },
+      { id: 'bi-filter-cat', title: 'Cliquer sur une catégorie filtre les articles' },
+      { id: 'bi-search', title: 'La recherche filtre les articles' },
+      { id: 'bi-tags', title: 'Les tags sont affichés sur les articles' }
+    ]
+  },
+  {
+    id: 'analytics',
+    title: '📈 Analytics',
+    items: [
+      { id: 'an-stats', title: '4 statistiques sur 30j s\'affichent' },
+      { id: 'an-chart1', title: 'Le graphique "Tâches par statut" (doughnut) s\'affiche' },
+      { id: 'an-chart2', title: 'Le graphique "Activité 30j" (line) s\'affiche' },
+      { id: 'an-storage', title: 'L\'utilisation par module est listée' },
+      { id: 'an-refresh', title: 'Le bouton 🔄 actualise les graphiques' }
+    ]
+  },
+  {
+    id: 'errortracker',
+    title: '⚠️ Error Tracker',
+    items: [
+      { id: 'er-create', title: 'Signaler une erreur fonctionne' },
+      { id: 'er-severity', title: '4 niveaux de sévérité (Critique, Haute, Moyenne, Faible)' },
+      { id: 'er-stack', title: 'La stack trace peut être ajoutée' },
+      { id: 'er-resolve', title: 'Le bouton ✓ marque comme résolue' },
+      { id: 'er-filter', title: 'Le filtre (Toutes/Non résolues/Résolues/Critiques) fonctionne' },
+      { id: 'er-stats', title: 'Les statistiques (Total, Critiques, Non résolues, Résolues) sont correctes' }
+    ]
+  },
+  {
+    id: 'gitcicd',
+    title: '🔀 Git & CI/CD',
+    items: [
+      { id: 'gi-types', title: '4 types d\'entrées (Commit, PR, Deploy, Build)' },
+      { id: 'gi-create', title: 'Créer une entrée fonctionne avec tous les champs' },
+      { id: 'gi-status', title: 'Les statuts s\'affichent avec couleur (succès, échec, etc.)' },
+      { id: 'gi-filter', title: 'Le filtre par type fonctionne' },
+      { id: 'gi-stats', title: 'Les statistiques (Commits, PRs, Deploys, Failed) sont correctes' }
+    ]
+  },
+  {
+    id: 'config',
+    title: '⚙️ Configuration',
+    items: [
+      { id: 'co-theme', title: 'Les boutons Clair/Sombre changent le thème' },
+      { id: 'co-profile', title: 'Le formulaire de profil sauvegarde les données' },
+      { id: 'co-storage', title: 'Les statistiques de stockage sont affichées' },
+      { id: 'co-export', title: 'Le bouton Exporter fonctionne' },
+      { id: 'co-reset', title: 'Le bouton "Tout effacer" demande DOUBLE confirmation' },
+      { id: 'co-modules', title: 'La liste des modules actifs est correcte' }
+    ]
+  },
+  {
+    id: 'persistence',
+    title: '💾 Persistance',
+    items: [
+      { id: 'pe-reload', title: 'Toutes les données sont conservées après F5' },
+      { id: 'pe-prefix', title: 'Les clés localStorage utilisent le préfixe "cyrias_"' },
+      { id: 'pe-isolated', title: 'Chaque module a ses propres clés isolées' },
+      { id: 'pe-export', title: 'L\'export complet contient toutes les données' },
+      { id: 'pe-import', title: 'L\'import restaure toutes les données' }
+    ]
+  },
+  {
+    id: 'responsive',
+    title: '📱 Responsive',
+    items: [
+      { id: 're-mobile', title: 'L\'interface s\'adapte sur mobile (< 768px)' },
+      { id: 're-tablet', title: 'L\'interface s\'adapte sur tablette' },
+      { id: 're-kanban', title: 'Le Kanban passe en 1 colonne sur mobile' }
+    ]
+  }
+];
+
+// ===== STATE =====
+const STORAGE_KEY = 'cyrias_tnr_checklist';
+let state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function getItemStatus(itemId) {
+  return state[itemId] || 'pending'; // pending | passed | failed
+}
+
+function setItemStatus(itemId, status) {
+  if (status === 'pending') delete state[itemId];
+  else state[itemId] = status;
+  saveState();
+  renderAll();
+}
+
+// ===== RENDER =====
+function renderAll() {
+  const container = document.getElementById('checklist-container');
+  container.innerHTML = CHECKLIST.map(section => {
+    const sectionItems = section.items;
+    const passed = sectionItems.filter(i => getItemStatus(i.id) === 'passed').length;
+    const failed = sectionItems.filter(i => getItemStatus(i.id) === 'failed').length;
+    const total = sectionItems.length;
+    const isComplete = passed === total;
+    
+    return `
+      <div class="checklist-section ${isComplete ? 'complete' : ''}" data-section="${section.id}">
+        <div class="checklist-section-header" onclick="toggleSection('${section.id}')">
+          <div class="checklist-section-title">
+            ${section.title}
+          </div>
+          <div class="checklist-progress">
+            ${passed}/${total} ${failed > 0 ? `(${failed} ❌)` : ''}
+          </div>
+        </div>
+        <div class="checklist-items">
+          ${sectionItems.map(item => {
+            const status = getItemStatus(item.id);
+            return `
+              <div class="checklist-item ${status === 'passed' ? 'checked' : ''} ${status === 'failed' ? 'failed' : ''}" 
+                   onclick="cycleStatus('${item.id}')">
+                <div class="checklist-checkbox">${status === 'passed' ? '✓' : status === 'failed' ? '✗' : ''}</div>
+                <div class="checklist-content">
+                  <div class="checklist-title">${escapeHtml(item.title)}</div>
+                  ${item.desc ? `<div class="checklist-desc">${escapeHtml(item.desc)}</div>` : ''}
+                </div>
+                <div class="checklist-actions" onclick="event.stopPropagation()">
+                  <button class="checklist-mini-btn" onclick="setItemStatus('${item.id}', 'passed')" title="OK">✓</button>
+                  <button class="checklist-mini-btn" onclick="setItemStatus('${item.id}', 'failed')" title="KO">✗</button>
+                  <button class="checklist-mini-btn" onclick="setItemStatus('${item.id}', 'pending')" title="Reset">↻</button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  updateStats();
+}
+
+function toggleSection(id) {
+  document.querySelector(`[data-section="${id}"]`)?.classList.toggle('open');
+}
+
+function cycleStatus(itemId) {
+  const current = getItemStatus(itemId);
+  const next = current === 'pending' ? 'passed' : current === 'passed' ? 'failed' : 'pending';
+  setItemStatus(itemId, next);
+}
+
+function updateStats() {
+  let total = 0, passed = 0, failed = 0;
+  CHECKLIST.forEach(s => {
+    s.items.forEach(i => {
+      total++;
+      const status = getItemStatus(i.id);
+      if (status === 'passed') passed++;
+      else if (status === 'failed') failed++;
+    });
+  });
+  const pending = total - passed - failed;
+  
+  document.getElementById('sum-total').textContent = total;
+  document.getElementById('sum-passed').textContent = passed;
+  document.getElementById('sum-failed').textContent = failed;
+  document.getElementById('sum-pending').textContent = pending;
+  
+  const pct = total > 0 ? ((passed + failed) / total) * 100 : 0;
+  document.getElementById('global-progress').style.width = pct + '%';
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = String(str);
+  return div.innerHTML;
+}
+
+// ===== EXPORT REPORT =====
+function exportReport() {
+  let total = 0, passed = 0, failed = 0;
+  const sections = CHECKLIST.map(s => ({
+    section: s.title,
+    items: s.items.map(i => {
+      total++;
+      const status = getItemStatus(i.id);
+      if (status === 'passed') passed++;
+      else if (status === 'failed') failed++;
+      return { title: i.title, status };
+    })
+  }));
+  
+  const report = {
+    timestamp: new Date().toISOString(),
+    summary: { total, passed, failed, pending: total - passed - failed },
+    sections
+  };
+  
+  // HTML
+  let html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Rapport TNR</title>
+<style>
+body{font-family:Inter,sans-serif;max-width:900px;margin:20px auto;padding:20px;color:#0F172A;}
+h1{color:#1B3B5C;}
+h2{color:#5EB091;border-bottom:2px solid #5EB091;padding-bottom:6px;margin-top:24px;}
+.summary{background:#F8FAFB;padding:16px;border-radius:8px;margin-bottom:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.summary div{text-align:center;}
+.summary strong{display:block;font-size:24px;}
+.passed{color:#16A34A;} .failed{color:#DC2626;} .pending{color:#D97706;}
+.item{padding:8px;border-bottom:1px solid #ECEFF2;display:flex;gap:10px;}
+.item.passed{background:#DCFCE7;} .item.failed{background:#FEE2E2;} .item.pending{background:#FEF3C7;}
+.status{font-weight:600;width:80px;}
+</style></head><body>
+<h1>📋 Rapport TNR - Cyrias Buddy</h1>
+<p>Généré le ${new Date(report.timestamp).toLocaleString('fr-FR')}</p>
+<div class="summary">
+  <div><strong>${total}</strong>Total</div>
+  <div class="passed"><strong>${passed}</strong>Validés</div>
+  <div class="failed"><strong>${failed}</strong>Échoués</div>
+  <div class="pending"><strong>${total - passed - failed}</strong>En attente</div>
+</div>`;
+  
+  sections.forEach(s => {
+    html += `<h2>${s.section}</h2>`;
+    s.items.forEach(i => {
+      const icon = i.status === 'passed' ? '✅' : i.status === 'failed' ? '❌' : '⏸';
+      html += `<div class="item ${i.status}"><span class="status">${icon}</span><span>${i.title}</span></div>`;
+    });
+  });
+  
+  html += '</body></html>';
+  
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `tnr_manual_${new Date().toISOString().split('T')[0]}.html`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===== EVENTS =====
+document.getElementById('btn-expand-all').addEventListener('click', () => {
+  document.querySelectorAll('.checklist-section').forEach(s => s.classList.add('open'));
+});
+document.getElementById('btn-collapse-all').addEventListener('click', () => {
+  document.querySelectorAll('.checklist-section').forEach(s => s.classList.remove('open'));
+});
+document.getElementById('btn-reset').addEventListener('click', () => {
+  if (confirm('Réinitialiser tous les statuts ?')) {
+    state = {};
+    saveState();
+    renderAll();
+  }
+});
+document.getElementById('btn-auto').addEventListener('click', () => location.href = 'index.html');
+document.getElementById('btn-back').addEventListener('click', () => location.href = '../index.html');
+document.getElementById('btn-export').addEventListener('click', exportReport);
+
+// Init
+renderAll();
+</script>
+
+</body>
+</html>

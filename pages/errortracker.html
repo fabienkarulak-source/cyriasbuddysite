@@ -1,0 +1,38 @@
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
+  <div>
+    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">⚠️ Error Tracker</h1>
+    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Suivi des erreurs</p>
+  </div>
+  <div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" id="err-new">+ Signaler une erreur</button></div>
+</div>
+<div class="stat-grid">
+  <div class="stat">
+    <div class="stat-label">Total</div>
+    <div class="stat-value" id="err-total">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Critiques</div>
+    <div class="stat-value" id="err-critical" style="color:var(--danger);">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Non résolues</div>
+    <div class="stat-value" id="err-open" style="color:var(--warn);">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Résolues</div>
+    <div class="stat-value" id="err-fixed" style="color:var(--ok-fg);">0</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Toutes les erreurs</h3>
+    <select class="select" id="err-filter" style="width:auto;">
+      <option value="">Toutes</option>
+      <option value="open">Non résolues</option>
+      <option value="resolved">Résolues</option>
+      <option value="critical">Critiques</option>
+    </select>
+  </div>
+  <div id="err-list"></div>
+</div>

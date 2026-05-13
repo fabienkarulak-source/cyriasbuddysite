@@ -1,0 +1,23 @@
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
+  <div>
+    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">🔔 Alertes</h1>
+    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Centre de notifications</p>
+  </div>
+  <div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" id="notif-mark-all">🧹 Tout lire</button></div>
+</div>
+<div class="stat-grid">
+  <div class="stat">
+    <div class="stat-label">Total</div>
+    <div class="stat-value" id="notif-total">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Non lues</div>
+    <div class="stat-value" id="notif-unread" style="color:var(--brand);">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Importantes</div>
+    <div class="stat-value" id="notif-important" style="color:var(--danger);">0</div>
+  </div>
+</div>
+
+<div id="notif-list"></div>

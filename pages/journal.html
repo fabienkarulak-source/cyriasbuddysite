@@ -1,0 +1,28 @@
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
+  <div>
+    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">📓 Journal de bord</h1>
+    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Vos notes et réflexions quotidiennes</p>
+  </div>
+  <div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" id="journal-new">+ Nouvelle entrée</button></div>
+</div>
+<div class="grid" style="grid-template-columns: 240px 1fr; gap:16px;">
+  <!-- Sidebar avec tags -->
+  <div class="card" style="padding:14px;">
+    <div class="text-xs font-semibold text-muted mb-2">FILTRES</div>
+    <input class="input mb-2" id="journal-search" placeholder="🔍 Rechercher...">
+    
+    <div class="text-xs font-semibold text-muted mb-2 mt-4">TAGS</div>
+    <div id="journal-tags"></div>
+    
+    <div class="text-xs font-semibold text-muted mb-2 mt-4">STATS</div>
+    <div class="text-xs text-muted">
+      <div>Total : <strong id="j-total">0</strong></div>
+      <div>Cette semaine : <strong id="j-week">0</strong></div>
+    </div>
+  </div>
+
+  <!-- Liste -->
+  <div>
+    <div id="journal-list"></div>
+  </div>
+</div>

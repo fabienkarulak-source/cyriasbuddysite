@@ -1,0 +1,15 @@
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
+  <div>
+    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">📖 TMA Formator</h1>
+    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Base de connaissances TMA</p>
+  </div>
+  <div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" id="bible-new">+ Nouvel article</button></div>
+</div>
+<div class="grid" style="grid-template-columns: 240px 1fr; gap:16px;">
+  <div class="card" style="padding:14px;">
+    <input class="input mb-4" id="bible-search" placeholder="🔍 Rechercher...">
+    <div class="text-xs font-semibold text-muted mb-2">CATÉGORIES</div>
+    <div id="bible-cats"></div>
+  </div>
+  <div id="bible-content"></div>
+</div>

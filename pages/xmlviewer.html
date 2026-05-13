@@ -1,0 +1,30 @@
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
+  <div>
+    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">🔧 Ivalua Context</h1>
+    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Visualiseur XML / contexte</p>
+  </div>
+  <div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" id="xml-import">📤 Importer</button><button class="btn btn-outline btn-sm" id="xml-format">✨ Formater</button><button class="btn btn-outline btn-sm" id="xml-copy">📋 Copier</button></div>
+</div>
+<div class="grid" style="grid-template-columns: 1fr 1fr; gap:16px;">
+  <div class="card">
+    <h3 class="card-title mb-4">📥 XML brut</h3>
+    <textarea class="textarea" id="xml-input" rows="20" style="font-family:var(--font-mono);font-size:11px;" placeholder="<?xml version='1.0'?>&#10;<root>&#10;  <element>...</element>&#10;</root>"></textarea>
+  </div>
+  
+  <div class="card">
+    <h3 class="card-title mb-4">🌳 Arbre XML</h3>
+    <div id="xml-tree" style="font-family:var(--font-mono);font-size:12px;max-height:500px;overflow:auto;background:var(--bg-subtle);padding:12px;border-radius:var(--radius);">
+      <div class="empty-state">
+        <div class="empty-state-text">Collez ou importez du XML et cliquez sur "Formater"</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.xml-node { padding: 2px 0; }
+.xml-tag { color: var(--info-fg); }
+.xml-attr { color: var(--brand); }
+.xml-text { color: var(--ink); }
+.xml-comment { color: var(--ink-muted); font-style: italic; }
+</style>
