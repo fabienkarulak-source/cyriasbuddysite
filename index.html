@@ -1,164 +1,59 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyrias Buddy — Portail & Outils</title>
+<script type="text/template" id="tpl-craminator">
+<div id="page-craminator">
+    </div>
+</script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<script type="text/template" id="tpl-clients">
+<div id="page-clients">
+    <div class="page-header">
+        <h1>🏢 Espace Client 360</h1>
+        <p>Pilotage commercial, financier et suivi hebdomadaire</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-4">
+        <div class="card p-4 md:col-span-1">
+            <input type="text" id="search-client-360" oninput="ClientsModule.renderList()" placeholder="Rechercher un client..." class="input mb-4">
+            <div id="client-360-list" class="flex flex-col gap-2 overflow-y-auto" style="max-height: 60vh;"></div>
+        </div>
 
-    <link rel="stylesheet" href="assets/css/main.css">
+        <div class="md:col-span-3">
+            <div id="client-360-placeholder" class="card empty-state">
+                <div class="empty-state-icon">🏢</div>
+                <div class="empty-state-text">Sélectionnez un client pour voir sa fiche complète</div>
+            </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-</head>
-<body>
-
-<div class="app">
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="brand">
-                <div class="brand-logo">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-                        <polyline points="9 12 12 15 17 10"/>
-                    </svg>
+            <div id="client-360-content" class="is-hidden">
+                <div class="flex gap-4 mb-4 border-b border-divider">
+                    <button class="btn btn-ghost active" onclick="ClientsModule.switchSubTab('suivi')">Suivi Hebdo</button>
+                    <button class="btn btn-ghost" onclick="ClientsModule.switchSubTab('stats')">Conso & Stats</button>
                 </div>
-                <div class="brand-name">CYR<span>IAS</span> Bud<span>dy</span></div>
+
+                <div id="subtab-suivi">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="card p-4">
+                            <h3 class="card-title mb-4">✍️ Nouveau point</h3>
+                            <div class="form-group">
+                                <label class="label">Sujets en cours</label>
+                                <textarea id="suivi-sujets" class="textarea" placeholder="Actions réalisées..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Points d'attention</label>
+                                <textarea id="suivi-attention" class="textarea" placeholder="Blocages, risques..."></textarea>
+                            </div>
+                            <button class="btn btn-primary w-full" onclick="ClientsModule.addNote()">Enregistrer la note</button>
+                        </div>
+                        <div class="card p-4">
+                            <h3 class="card-title mb-4">📜 Historique</h3>
+                            <div id="suivi-history-list" class="flex flex-col gap-4"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="subtab-stats" class="is-hidden">
+                    <div class="card p-4">Chargement des données CRA...</div>
+                </div>
             </div>
-            <button class="sidebar-collapse-btn" id="sidebar-collapse-btn" title="Réduire / déplier (Ctrl+B)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/>
-                </svg>
-            </button>
-            <button class="theme-toggle" id="toggle-theme" title="Basculer thème">
-                <span id="theme-icon"></span>
-            </button>
         </div>
-
-        <div class="sidebar-nav">
-            <button class="nav-search-btn" onclick="openGlobalSearch()">
-                <span class="nav-search-label">🔍 Recherche rapide</span>
-                <kbd>Ctrl+K</kbd>
-            </button>
-
-            <div id="sidebar-nav"></div>
-        </div>
-
-        <div class="nav-footer">
-            <button class="nav-item" id="nav-config">
-                <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
-                <span>Configuration</span>
-            </button>
-        </div>
-    </nav>
-
-    <button class="sidebar-toggle-btn" id="toggle-menu">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>
-    </button>
-
-    <main class="main-content" id="content"></main>
+    </div>
 </div>
-
-<script type="text/template" id="tpl-dashboard">
-    <div id="home-welcome-banner">
-        <h1><span id="home-greeting">Bonjour</span> <span id="home-username"></span></h1>
-        <p id="home-date" class="text-muted"></p>
-    </div>
-    <div class="stat-grid" id="home-grid"></div>
-    <h3 class="section-title">Liens rapides</h3>
-    <div id="home-links-container" class="content-grid"></div>
 </script>
-
-<script type="text/template" id="tpl-analytics">
-    <div class="page-header">
-        <div><h1>📊 Analytics & Vélocité</h1><p>Statistiques de productivité</p></div>
-        <button class="btn btn-outline" id="ana-refresh">🔄 Actualiser</button>
-    </div>
-    <div class="stat-grid">
-        <div class="stat"><div class="stat-label">Tâches 30J</div><div class="stat-value" id="ana-tasks-30">0</div></div>
-        <div class="stat"><div class="stat-label">Terminées</div><div class="stat-value text-ok" id="ana-done-30">0</div></div>
-        <div class="stat"><div class="stat-label">Vélocité</div><div class="stat-value" id="ana-velocity">0</div></div>
-        <div class="stat"><div class="stat-label">Journal</div><div class="stat-value" id="ana-journal-30">0</div></div>
-    </div>
-    <div class="grid grid-2 mt-4">
-        <div class="card"><div class="card-header"><h3>Statut des tâches</h3></div><div class="card-body" style="height:280px"><canvas id="chart-tasks"></canvas></div></div>
-        <div class="card"><div class="card-header"><h3>Activité (30j)</h3></div><div class="card-body" style="height:280px"><canvas id="chart-activity"></canvas></div></div>
-    </div>
-</script>
-
-<script type="text/template" id="tpl-bible">
-    <div class="page-header">
-        <div><h1>📖 TMA Formator</h1><p>Base de connaissances opérationnelle</p></div>
-        <button class="btn btn-primary" id="bible-new">+ Nouvel Article</button>
-    </div>
-    <div class="flex gap-4">
-        <div id="bible-cats" style="width:200px;"></div>
-        <div id="bible-content" class="flex-1"></div>
-    </div>
-</script>
-
-<script type="text/template" id="tpl-agregator">
-    <div class="page-header">
-        <div><h1>🏗️ Stafiz Agregator</h1><p>Gestion des sources de données</p></div>
-        <div class="flex gap-2">
-            <button class="btn btn-outline" id="agr-import">📥 Importer JSON/CSV</button>
-            <button class="btn btn-primary" id="agr-new">+ Nouvelle Source</button>
-        </div>
-    </div>
-    <div class="stat-grid">
-        <div class="stat"><div class="stat-label">Sources</div><div class="stat-value" id="agr-sources">0</div></div>
-        <div class="stat"><div class="stat-label">Lignes</div><div class="stat-value" id="agr-records">0</div></div>
-        <div class="stat"><div class="stat-label">Dernière synchro</div><div class="stat-value" id="agr-last" style="font-size:14px">—</div></div>
-    </div>
-    <div id="agr-list" class="mt-4"></div>
-</script>
-
-<script type="text/template" id="tpl-communicator">
-    <div class="page-header">
-        <div><h1>✉️ Communicator</h1><p>Modèles de messages bilingues</p></div>
-        <button class="btn btn-primary" id="com-new">+ Nouveau Modèle</button>
-    </div>
-    <input type="text" id="com-search" class="input mb-4" placeholder="Rechercher un modèle...">
-    <div class="grid grid-2" id="com-list"></div>
-</script>
-
-<script type="text/template" id="tpl-config">
-    <div class="page-header"><h1>⚙️ Configuration</h1></div>
-    <div class="grid grid-2">
-        <div class="card">
-            <div class="card-header"><h3>Données</h3></div>
-            <div class="card-body">
-                <button class="btn btn-outline w-full mb-2" id="btn-export">⬇️ Exporter Sauvegarde (JSON)</button>
-                <button class="btn btn-outline w-full" id="btn-import">⬆️ Importer Sauvegarde</button>
-            </div>
-        </div>
-    </div>
-</script>
-
-<script src="assets/js/storage.js"></script>
-<script src="assets/js/ui.js"></script>
-<script src="assets/js/router.js"></script>
-
-<script src="modules/agregator.js"></script>
-<script src="modules/analytics.js"></script>
-<script src="modules/bible.js"></script>
-<script src="modules/communicator.js"></script>
-<script src="assets/js/app.js"></script>
-
-<script>
-    // Ces fonctions assurent la liaison entre les boutons de la sidebar 
-    // et le nouveau moteur de routage modulaire.
-    function navigateTo(page) { Router.navigate(page); }
-    function toggleNavSection(name) {
-        const sec = document.querySelector(`.nav-section[data-section="${name}"]`);
-        if (sec) sec.classList.toggle('nav-collapsed');
-    }
-    function toggleSidebar() { App.toggleSidebar(); }
-    function toggleTheme() { App.setTheme(App.config.theme === 'light' ? 'dark' : 'light'); }
-    function openGlobalSearch() { Toast.info("Recherche bientôt disponible"); }
-</script>
-
-</body>
-</html>
