@@ -1,54 +1,64 @@
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);padding-bottom:var(--space-4);border-bottom:1px solid var(--border);">
-  <div>
-    <h1 style="font-size:var(--fs-2xl);font-weight:var(--fw-extrabold);font-family:'Outfit',sans-serif;letter-spacing:-0.5px;">📊 CRAminator</h1>
-    <p style="font-size:var(--fs-md);color:var(--ink-muted);margin-top:4px;">Analyse et gestion des CRA</p>
-  </div>
-  <div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" id="cra-export">📥 Exporter</button><button class="btn btn-primary btn-sm" id="cra-new">📤 Importer CRA</button></div>
-</div>
-<div class="stat-grid">
-  <div class="stat">
-    <div class="stat-label">CRAs ce mois</div>
-    <div class="stat-value" id="cra-month">0</div>
-  </div>
-  <div class="stat">
-    <div class="stat-label">Jours facturés</div>
-    <div class="stat-value" id="cra-days">0</div>
-  </div>
-  <div class="stat">
-    <div class="stat-label">Total CA</div>
-    <div class="stat-value" id="cra-ca">0 €</div>
-  </div>
-  <div class="stat">
-    <div class="stat-label">Taux moyen</div>
-    <div class="stat-value" id="cra-tjm">0 €</div>
-  </div>
-</div>
-
-<div class="card">
-  <div class="card-header">
-    <h3 class="card-title">Tous les CRAs</h3>
-    <div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" id="cra-export">📥 Exporter</button>
-      <select class="select" id="cra-filter-month" style="width:auto;">
-        <option value="">Tous mois</option>
-      </select>
-      <select class="select" id="cra-filter-client" style="width:auto;">
-        <option value="">Tous clients</option>
-      </select>
+<div id="page-craminator">
+    <div class="page-header" style="padding-bottom: 20px; border-bottom: 1px solid var(--border);">
+        <div>
+            <h1 style="font-family: 'Fraunces', serif; font-size: 28px; font-weight: 800; color: var(--primary);">CRAminator</h1>
+            <p style="color: var(--ink-muted); font-size: 14px; margin-top: 4px;">Analyse d'export Stafiz</p>
+        </div>
     </div>
-  </div>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Client</th>
-        <th>Projet</th>
-        <th>Jours</th>
-        <th>TJM</th>
-        <th>Total</th>
-        <th>Statut</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody id="cra-tbody"></tbody>
-  </table>
+
+    <div class="tools-container">
+        <div id="upload-section">
+            <div id="source-manager" class="is-hidden mb-6 card p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-primary">Sources de données</h3>
+                        <p class="text-xs text-muted"><span id="source-count">0</span> source(s) — <span id="total-records-count">0</span> lignes</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <label class="btn btn-outline text-xs cursor-pointer">
+                            + Ajouter
+                            <input type="file" class="is-hidden" accept=".xlsx,.xls,.csv" multiple onchange="CRAModule.handleFiles(event)">
+                        </label>
+                        <button onclick="CRAModule.clearData()" class="btn btn-danger text-xs">Tout effacer</button>
+                    </div>
+                </div>
+                <div id="source-chips" class="flex flex-wrap gap-2"></div>
+            </div>
+
+            <div id="drop-zone" class="card p-12 text-center" style="border: 2px dashed var(--brand); background: var(--bg);">
+                <h2 class="text-xl font-bold mb-2 text-primary">Importez vos fichiers Stafiz</h2>
+                <label class="btn btn-primary cursor-pointer mt-4">
+                    Parcourir mes fichiers
+                    <input type="file" class="is-hidden" accept=".xlsx,.xls,.csv" multiple onchange="CRAModule.handleFiles(event)">
+                </label>
+            </div>
+            <div id="upload-progress-container" class="is-hidden mt-4">
+                <div class="text-xs text-brand mb-1">Traitement en cours... <span id="upload-progress-text">0%</span></div>
+                <div style="background:var(--border-subtle); height:6px; border-radius:3px;">
+                    <div id="upload-progress-bar" style="height:100%; width:0%; background:var(--brand); border-radius:3px; transition:width 0.2s;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="dashboard-section" class="is-hidden">
+            <div class="flex gap-2 mb-4">
+                <button onclick="CRAModule.switchTab('dashboard')" id="btn-tab-dashboard" class="btn btn-primary text-xs">Dashboard</button>
+                <button onclick="CRAModule.switchTab('explorer')" id="btn-tab-explorer" class="btn btn-outline text-xs">Explorateur</button>
+            </div>
+
+            <div id="dashboard-content">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="card p-4"><h3 class="text-sm font-bold mb-3">Jours par Client</h3><div style="height:250px;"><canvas id="clientChart"></canvas></div></div>
+                    <div class="card p-4"><h3 class="text-sm font-bold mb-3">Répartition par Tâche</h3><div style="height:250px;"><canvas id="taskChart"></canvas></div></div>
+                </div>
+            </div>
+
+            <div id="explorer-content" class="is-hidden card p-0 overflow-x-auto">
+                <table class="table min-w-full">
+                    <thead><tr><th>Date</th><th>Client</th><th>Collaborateur</th><th>Jours</th><th>Tâche</th></tr></thead>
+                    <tbody id="explorer-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
