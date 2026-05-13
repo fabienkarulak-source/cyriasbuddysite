@@ -6,78 +6,13 @@
     <title>Cyrias Buddy — Portail Modulaire</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="assets/css/main.css">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.default.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
-
-    <style>
-        /* ============================================================
-           CSS INTÉGRÉ POUR GARANTIR L'AFFICHAGE ET LES MENUS
-           ============================================================ */
-        :root {
-            --brand: #5EB091; --brand-hover: #4A9076; --brand-soft: #E6F4EF;
-            --primary: #1B3B5C; --primary-hover: #2A517A; --primary-soft: #EEF2F7;
-            --bg: #F8FAFB; --bg-subtle: #F1F4F6; --surface: #FFFFFF;
-            --border: #E5E9EE; --border-strong: #CFD6DE; --divider: #ECEFF2;
-            --ink: #0F172A; --ink-secondary: #475569; --ink-muted: #94A3B8;
-            --font-ui: 'Inter', 'Outfit', sans-serif; --font-mono: 'JetBrains Mono', monospace;
-            --t-fast: 0.15s ease; --t-base: 0.25s ease;
-            --radius-sm: 6px; --radius: 8px; --radius-md: 12px;
-        }
-
-        [data-theme="dark"] {
-            --bg: #0B1220; --bg-subtle: #111827; --surface: #151E2E;
-            --border: #243248; --border-strong: #334155; --divider: #1F2A3D;
-            --ink: #F1F5F9; --ink-secondary: #CBD5E1; --ink-muted: #64748B;
-            --primary: #5EB091; --brand: #5EB091;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: var(--font-ui); background: var(--bg); color: var(--ink); display: flex; min-height: 100vh; overflow-x: hidden; }
-
-        /* SIDEBAR & MENUS */
-        .sidebar { width: 248px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 200; }
-        .sidebar-header { padding: 24px; border-bottom: 1px solid var(--divider); display: flex; align-items: center; justify-content: space-between; }
-        .brand-name { font-size: 17px; font-weight: 800; color: var(--ink); }
-        .brand-name span { color: var(--brand); }
-        
-        .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
-        .nav-section { margin-bottom: 12px; }
-        .nav-section-header { display: flex; align-items: center; gap: 6px; width: 100%; padding: 8px 12px; background: none; border: none; cursor: pointer; color: var(--ink-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; }
-        .nav-section-chevron svg { transition: transform var(--t-base); }
-        .nav-section.nav-collapsed .nav-section-chevron svg { transform: rotate(-90deg); }
-        
-        /* C'EST CETTE LIGNE QUI FAIT FONCTIONNER L'ACCORDÉON */
-        .nav-section-body { display: flex; flex-direction: column; overflow: hidden; max-height: 600px; transition: max-height var(--t-base) ease-in-out; }
-        .nav-section.nav-collapsed .nav-section-body { max-height: 0; }
-
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: var(--ink-secondary); font-size: 13px; font-weight: 500; border: none; background: none; width: 100%; text-align: left; margin-bottom: 2px; }
-        .nav-item:hover { background: var(--bg-subtle); color: var(--ink); }
-        .nav-item.active { background: var(--brand-soft); color: var(--brand); font-weight: 600; border-left: 3px solid var(--brand); }
-        .nav-icon { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; }
-
-        /* MAIN CONTENT */
-        .main-content { flex: 1; margin-left: 248px; padding: 32px 40px; }
-        .page-header { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
-        .page-header h1 { font-size: 24px; font-weight: 800; color: var(--ink); font-family: 'Fraunces', serif; }
-        .page-header p { font-size: 14px; color: var(--ink-muted); margin-top: 4px; }
-
-        /* BASICS UI */
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .grid { display: grid; gap: 20px; }
-        .grid-2 { grid-template-columns: repeat(2, 1fr); }
-        .grid-3 { grid-template-columns: repeat(3, 1fr); }
-        .btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { background: transparent; border-color: var(--border); color: var(--ink); }
-        .btn-ghost { background: transparent; color: var(--ink-secondary); }
-        .btn-ghost.active { border-bottom: 2px solid var(--brand); color: var(--brand); border-radius: 0; }
-        .is-hidden { display: none !important; }
-        .flex { display: flex; } .gap-2 { gap: 8px; } .mb-4 { margin-bottom: 16px; }
-        .input, .textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 13px; background: var(--bg); color: var(--ink); }
-        .textarea { min-height: 80px; resize: vertical; }
-    </style>
 </head>
 <body>
 
@@ -91,212 +26,36 @@
             <div class="brand">
                 <div class="brand-name">CYR<span>IAS</span> Bud<span>dy</span></div>
             </div>
+            <button class="sidebar-collapse-btn" id="sidebar-collapse-btn" title="Réduire (Ctrl+B)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
+            </button>
+            <button class="theme-toggle" id="toggle-theme"><span id="theme-icon"></span></button>
         </div>
 
-        <div class="sidebar-nav">
-            <div class="nav-section" data-section="quotidien">
-                <button class="nav-section-header" onclick="toggleNavSection('quotidien')">
-                    <span class="nav-section-chevron">▼</span>
-                    <span class="nav-section-label">Espace quotidien</span>
-                </button>
-                <div class="nav-section-body">
-                    <button data-route="dashboard" class="nav-item active" onclick="navigateTo('dashboard')"><span class="nav-icon">🏠</span> Accueil</button>
-                    <button data-route="clients" class="nav-item" onclick="navigateTo('clients')"><span class="nav-icon">🏢</span> Espace Client 360</button>
-                    <button data-route="organisator" class="nav-item" onclick="navigateTo('organisator')"><span class="nav-icon">📅</span> Organisator</button>
-                </div>
+        <div class="sidebar-nav" id="sidebar-nav">
             </div>
 
-            <div class="nav-section" data-section="pilotage">
-                <button class="nav-section-header" onclick="toggleNavSection('pilotage')">
-                    <span class="nav-section-chevron">▼</span>
-                    <span class="nav-section-label">Pilotage</span>
-                </button>
-                <div class="nav-section-body">
-                    <button data-route="craminator" class="nav-item" onclick="navigateTo('craminator')"><span class="nav-icon">📊</span> CRAminator</button>
-                    <button data-route="facturator" class="nav-item" onclick="navigateTo('facturator')"><span class="nav-icon">💶</span> Facturator</button>
-                    <button data-route="kanban" class="nav-item" onclick="navigateTo('kanban')"><span class="nav-icon">📋</span> Kanban & MEP</button>
-                </div>
-            </div>
-
-            <div class="nav-section" data-section="techniques">
-                <button class="nav-section-header" onclick="toggleNavSection('techniques')">
-                    <span class="nav-section-chevron">▼</span>
-                    <span class="nav-section-label">Outils techniques</span>
-                </button>
-                <div class="nav-section-body">
-                    <button data-route="analytics" class="nav-item" onclick="navigateTo('analytics')"><span class="nav-icon">🥧</span> Analytics</button>
-                    <button data-route="communicator" class="nav-item" onclick="navigateTo('communicator')"><span class="nav-icon">✉️</span> Communicator</button>
-                </div>
-            </div>
+        <div class="nav-footer">
+            <button class="nav-item" id="nav-config" onclick="Router.navigate('config')">
+                <span class="nav-icon">⚙️</span> Configuration
+            </button>
         </div>
     </nav>
+
+    <button class="sidebar-toggle-btn" id="toggle-menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>
+    </button>
 
     <main class="main-content" id="content"></main>
 </div>
 
-<script type="text/template" id="tpl-dashboard">
-    <div class="page-header">
-        <h1>Accueil</h1>
-        <p>Bienvenue sur votre portail TMA</p>
-    </div>
-    <div class="grid grid-3">
-        <div class="card" onclick="navigateTo('kanban')" style="cursor:pointer; border-left:4px solid var(--info);">
-            <div style="font-size:12px; color:var(--ink-muted); text-transform:uppercase; font-weight:700;">Tickets ouverts</div>
-            <div style="font-size:24px; font-weight:800; margin-top:8px;">12</div>
-        </div>
-        <div class="card" onclick="navigateTo('craminator')" style="cursor:pointer; border-left:4px solid var(--brand);">
-            <div style="font-size:12px; color:var(--ink-muted); text-transform:uppercase; font-weight:700;">Jours saisis ce mois</div>
-            <div style="font-size:24px; font-weight:800; margin-top:8px;">45.5</div>
-        </div>
-    </div>
-</script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/router.js"></script>
 
-<script type="text/template" id="tpl-clients">
-    <div class="page-header">
-        <h1>🏢 Espace Client 360</h1>
-        <p>Pilotage commercial, financier et suivi hebdomadaire</p>
-    </div>
-    
-    <div class="grid" style="grid-template-columns: 280px 1fr;">
-        <div class="card" style="height: fit-content;">
-            <h3 style="font-size:14px; font-weight:700; margin-bottom:12px;">Clients</h3>
-            <input type="text" id="search-client-360" oninput="ClientsModule.renderList()" placeholder="Rechercher..." class="input mb-4">
-            <div id="client-360-list" class="flex flex-col gap-2 overflow-y-auto" style="max-height: 60vh;"></div>
-        </div>
+<script src="modules/craminator.js"></script>
+<script src="modules/clients.js"></script>
+<script src="assets/js/app.js"></script>
 
-        <div>
-            <div id="client-360-placeholder" class="card text-center" style="padding:40px; color:var(--ink-muted);">
-                <div style="font-size:32px; margin-bottom:8px;">🏢</div>
-                Sélectionnez un client dans la liste pour voir sa fiche complète
-            </div>
-
-            <div id="client-360-content" class="is-hidden">
-                <div class="flex gap-2 mb-4" style="border-bottom: 1px solid var(--border);">
-                    <button class="btn btn-ghost active" onclick="ClientsModule.switchSubTab('suivi')" id="tab-btn-suivi">📝 Suivi Hebdo</button>
-                    <button class="btn btn-ghost" onclick="ClientsModule.switchSubTab('stats')" id="tab-btn-stats">📊 Conso & Stats</button>
-                </div>
-
-                <div id="subtab-suivi">
-                    <div class="grid grid-2">
-                        <div class="card">
-                            <h3 style="font-size:14px; font-weight:700; margin-bottom:12px;">✍️ Nouveau point</h3>
-                            <label style="font-size:11px; font-weight:700; color:var(--ink-muted); text-transform:uppercase;">Sujets en cours</label>
-                            <textarea id="suivi-sujets" class="textarea mb-4 mt-2" placeholder="Actions réalisées..."></textarea>
-                            
-                            <label style="font-size:11px; font-weight:700; color:var(--ink-muted); text-transform:uppercase;">Points d'attention</label>
-                            <textarea id="suivi-attention" class="textarea mb-4 mt-2" placeholder="Risques, alertes..."></textarea>
-                            
-                            <button class="btn btn-primary w-full" onclick="ClientsModule.addNote()">Enregistrer la note</button>
-                        </div>
-                        <div class="card">
-                            <h3 style="font-size:14px; font-weight:700; margin-bottom:12px;">📜 Historique</h3>
-                            <div id="suivi-history-list" class="flex flex-col gap-4 overflow-y-auto" style="max-height: 500px;"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="subtab-stats" class="is-hidden">
-                    <div class="card text-center" style="padding:40px; color:var(--ink-muted);">
-                        Les données de temps et de facturation arriveront ici.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</script>
-
-<script type="text/template" id="tpl-craminator">
-    <div id="page-craminator" style="display:block !important;">
-        <div class="page-header">
-            <h1>CRAminator</h1>
-            <p>Analyse des temps saisis</p>
-        </div>
-        <div id="upload-section" class="card text-center mb-4" style="border: 2px dashed var(--brand); padding: 40px;">
-            <h2 style="font-size:18px; font-weight:700; margin-bottom:8px;">Importez vos fichiers Stafiz bruts</h2>
-            <label class="btn btn-primary cursor-pointer mt-4">
-                Parcourir mes fichiers
-                <input type="file" class="is-hidden" accept=".xlsx,.xls,.csv" multiple onchange="CRAModule.handleFiles(event)">
-            </label>
-        </div>
-        <div id="dashboard-section" class="is-hidden">
-            <div class="flex gap-2 mb-4">
-                <button onclick="CRAModule.switchTab('dashboard')" id="btn-tab-dashboard" class="btn btn-primary">Dashboard</button>
-                <button onclick="CRAModule.switchTab('explorer')" id="btn-tab-explorer" class="btn btn-outline">Explorateur</button>
-                <button onclick="CRAModule.clearData()" class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); margin-left:auto;">Effacer données</button>
-            </div>
-            <div id="dashboard-content" class="grid grid-2">
-                <div class="card"><h3 style="font-size:14px; margin-bottom:12px; font-weight:700;">Jours par Client</h3><div style="height:250px;"><canvas id="clientChart"></canvas></div></div>
-                <div class="card"><h3 style="font-size:14px; margin-bottom:12px; font-weight:700;">Répartition par Tâche</h3><div style="height:250px;"><canvas id="taskChart"></canvas></div></div>
-            </div>
-            <div id="explorer-content" class="is-hidden card">
-                <table style="width:100%; text-align:left; font-size:12px;">
-                    <thead style="border-bottom:2px solid var(--border);"><tr><th style="padding:10px;">Client</th><th style="padding:10px;">Collaborateur</th><th style="padding:10px;">Jours</th><th style="padding:10px;">Tâche</th></tr></thead>
-                    <tbody id="explorer-table-body"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</script>
-
-<script>
-    // 1. GESTION DE L'ACCORDÉON DU MENU
-    function toggleNavSection(name) {
-        const sec = document.querySelector(`.nav-section[data-section="${name}"]`);
-        if (sec) {
-            sec.classList.toggle('nav-collapsed');
-            
-            // Mémorise le choix dans localStorage
-            const collapsed = JSON.parse(localStorage.getItem('cyrias_nav_collapsed') || '["techniques"]');
-            if (sec.classList.contains('nav-collapsed')) {
-                if (!collapsed.includes(name)) collapsed.push(name);
-            } else {
-                const idx = collapsed.indexOf(name);
-                if (idx > -1) collapsed.splice(idx, 1);
-            }
-            localStorage.setItem('cyrias_nav_collapsed', JSON.stringify(collapsed));
-        }
-    }
-
-    // Applique l'état des menus au lancement
-    window.addEventListener('DOMContentLoaded', () => {
-        const collapsed = JSON.parse(localStorage.getItem('cyrias_nav_collapsed') || '["techniques"]');
-        collapsed.forEach(name => {
-            const sec = document.querySelector(`.nav-section[data-section="${name}"]`);
-            if (sec) sec.classList.add('nav-collapsed');
-        });
-    });
-
-    // 2. ROUTEUR SIMPLIFIÉ (Spécial Templates)
-    const Router = {
-        routes: {},
-        contentEl: null,
-
-        init() {
-            this.contentEl = document.getElementById('content');
-            window.addEventListener('popstate', () => this.navigate(window.location.hash.replace('#/', '') || 'dashboard', false));
-            this.navigate(window.location.hash.replace('#/', '') || 'dashboard', false);
-        },
-
-        register(name, moduleObj) {
-            this.routes[name] = moduleObj;
-        },
-
-        navigate(name, push = true) {
-            if (!this.routes[name]) name = 'dashboard';
-            
-            // Détruire les graphes de l'ancien module pour éviter les plantages
-            if (this.currentModule && this.currentModule.destroy) {
-                this.currentModule.destroy();
-            }
-
-            // Injecter le HTML
-            const tpl = document.getElementById('tpl-' + name);
-            if (tpl) {
-                this.contentEl.innerHTML = tpl.innerHTML;
-            } else {
-                this.contentEl.innerHTML = `<div class="card p-6 text-danger">Template tpl-${name} introuvable.</div>`;
-            }
-
-            // Surligner le menu
-            document.querySelectorAll('.nav-item').forEach(el => {
-                el.classList.toggle('active', el.dataset.route === name);
+</body>
+</html>
