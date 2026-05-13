@@ -39,9 +39,9 @@ const GitHubDB = {
     return false;
   },
 
-  push() {
+ push() {
     const token = this.getToken();
-    if (!token) return; // S'il n'y a pas de token, on ne tente pas d'envoyer
+    if (!token) return;
 
     clearTimeout(this.syncTimeout);
     this.syncTimeout = setTimeout(async () => {
@@ -49,31 +49,55 @@ const GitHubDB = {
         const allData = {};
         for (let i = 0; i < localStorage.length; i++) {
           const k = localStorage.key(i);
+          // On sauvegarde tout ce qui commence par cyrias_ (données, config, etc.)
           if (k.startsWith('cyrias_') && k !== 'cyrias_github_token') {
             allData[k] = localStorage.getItem(k);
           }
         }
+
         const contentB64 = btoa(unescape(encodeURIComponent(JSON.stringify(allData, null, 2))));
-        const body = { message: "Auto-sync Cyrias Buddy", content: contentB64 };
+        
+        // 1. On vérifie d'abord si le fichier existe pour récupérer son SHA actuel
+        // Cela évite l'erreur 409 (Conflict)
+        const checkRes = await fetch(`https://api.github.com/repos/${this.config.owner}/${this.config.repo}/contents/${this.config.path}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (checkRes.ok) {
+            const fileInfo = await checkRes.json();
+            this.config.sha = fileInfo.sha;
+        }
+
+        const body = { 
+            message: "Mise à jour Cyrias Buddy", 
+            content: contentB64 
+        };
+        
+        // Si on a un SHA, on l'ajoute obligatoirement pour avoir le droit de modifier
         if (this.config.sha) body.sha = this.config.sha;
 
         const res = await fetch(`https://api.github.com/repos/${this.config.owner}/${this.config.repo}/contents/${this.config.path}`, {
           method: 'PUT',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          headers: { 
+              'Authorization': `Bearer ${token}`, 
+              'Content-Type': 'application/json' 
+          },
           body: JSON.stringify(body)
         });
         
         if (res.ok) {
             const data = await res.json();
             this.config.sha = data.content.sha;
-            console.log("☁️ BDD GitHub: Sauvegarde réussie.");
+            console.log("☁️ BDD GitHub: Données transmises avec succès !");
         } else {
-            console.error("☁️ Erreur 401: Token invalide ou expiré.");
+            const errData = await res.json();
+            console.error("☁️ Échec de transmission :", errData.message);
         }
-      } catch (e) { console.error("☁️ Erreur Sauvegarde GitHub", e); }
-    }, 2500);
+      } catch (e) { 
+          console.error("☁️ Erreur réseau GitHub", e); 
+      }
+    }, 2000); // Délai de 2 secondes après la dernière saisie
   }
-};
 
 const Storage = {
   PREFIX: 'cyrias_',
