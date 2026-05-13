@@ -1,20 +1,31 @@
-/**
- * STORAGE.JS - Stockage local avec synchronisation cloud GitHub
- */
 const GitHubDB = {
   config: {
-    token: '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', // ⚠️ Token GitHub
-    owner: 'fabienkarulak-source',                // ⚠️ Ton pseudo GitHub
-    repo: 'cyriasbuddysite',            // ⚠️ Le repo qui stocke le json
+    // On ne met PLUS le token ici en dur !
+    owner: 'fabienkarulak-source',      
+    repo: 'cyriasbuddysite',           
     path: 'cyrias-db.json',
     sha: null
   },
   syncTimeout: null,
 
+  getToken() {
+    // Récupère le token depuis la mémoire locale du navigateur
+    return localStorage.getItem('cyrias_github_token');
+  },
+
   async pull() {
+    const token = this.getToken();
+    if (!token) {
+        console.log("☁️ BDD GitHub: Aucun token configuré. Mode local uniquement.");
+        return false;
+    }
+
     try {
       const res = await fetch(`https://api.github.com/repos/${this.config.owner}/${this.config.repo}/contents/${this.config.path}`, {
-        headers: { 'Authorization': `Bearer ${this.config.token}`, 'Accept': 'application/vnd.github.v3+json' }
+        headers: { 
+            'Authorization': `Bearer ${token}`, 
+            'Accept': 'application/vnd.github.v3+json' 
+        }
       });
       if (res.ok) {
         const data = await res.json();
@@ -24,18 +35,21 @@ const GitHubDB = {
         console.log("☁️ BDD GitHub: Données synchronisées !");
         return true;
       }
-    } catch (e) { console.warn("☁️ BDD GitHub: Mode hors-ligne actif."); }
+    } catch (e) { console.warn("☁️ BDD GitHub: Échec de la connexion."); }
     return false;
   },
 
   push() {
+    const token = this.getToken();
+    if (!token) return; // S'il n'y a pas de token, on ne tente pas d'envoyer
+
     clearTimeout(this.syncTimeout);
     this.syncTimeout = setTimeout(async () => {
       try {
         const allData = {};
         for (let i = 0; i < localStorage.length; i++) {
           const k = localStorage.key(i);
-          if (k.startsWith('cyrias_') || k.startsWith('cra_') || k.startsWith('compagnon_')) {
+          if (k.startsWith('cyrias_') && k !== 'cyrias_github_token') {
             allData[k] = localStorage.getItem(k);
           }
         }
@@ -45,36 +59,35 @@ const GitHubDB = {
 
         const res = await fetch(`https://api.github.com/repos/${this.config.owner}/${this.config.repo}/contents/${this.config.path}`, {
           method: 'PUT',
-          headers: { 'Authorization': `Bearer ${this.config.token}`, 'Content-Type': 'application/json' },
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
+        
         if (res.ok) {
-          const data = await res.json();
-          this.config.sha = data.content.sha;
+            const data = await res.json();
+            this.config.sha = data.content.sha;
+            console.log("☁️ BDD GitHub: Sauvegarde réussie.");
+        } else {
+            console.error("☁️ Erreur 401: Token invalide ou expiré.");
         }
       } catch (e) { console.error("☁️ Erreur Sauvegarde GitHub", e); }
-    }, 2500); // 2.5s de debounce pour ne pas spammer l'API GitHub
+    }, 2500);
   }
 };
 
 const Storage = {
   PREFIX: 'cyrias_',
-  
-  async initCloud() {
-    await GitHubDB.pull();
-  },
-
+  async initCloud() { await GitHubDB.pull(); },
   get(key, defaultValue = null) {
     try {
       const raw = localStorage.getItem(this.PREFIX + key);
       return raw !== null ? JSON.parse(raw) : defaultValue;
     } catch (e) { return defaultValue; }
   },
-
   set(key, value) {
     try {
       localStorage.setItem(this.PREFIX + key, JSON.stringify(value));
-      GitHubDB.push(); // Sauvegarde sur GitHub à chaque modif
+      GitHubDB.push(); 
       return true;
     } catch (e) { return false; }
   }
