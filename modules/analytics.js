@@ -12,7 +12,7 @@ const AnalyticsModule = {
     });
   },
 
-  // ⚡ Crucial pour éviter les crashs de Canvas lors du changement de page
+  // ⚡ Fonction indispensable pour éviter que le Router plante
   destroy() {
     Object.values(this.charts).forEach(chart => {
       if (chart) chart.destroy();
@@ -51,7 +51,6 @@ const AnalyticsModule = {
     const kanban = Storage.get('kanban', { tasks: [] });
     const tasks = kanban.tasks || [];
     
-    // Chart 1: Tâches par statut
     const ctx1 = document.getElementById('chart-tasks');
     if (ctx1) {
       if (this.charts.tasks) this.charts.tasks.destroy();
@@ -68,7 +67,6 @@ const AnalyticsModule = {
       });
     }
 
-    // Chart 2: Activité 30 jours
     const ctx2 = document.getElementById('chart-activity');
     if (ctx2) {
       if (this.charts.activity) this.charts.activity.destroy();
