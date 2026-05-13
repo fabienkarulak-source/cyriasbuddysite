@@ -22,7 +22,8 @@ const App = {
       { name: 'bible', title: 'TMA Formator', page: 'bible', module: 'BibleModule', section: 'techniques', icon: 'book' },
       { name: 'communicator', title: 'Communicator', page: 'communicator', module: 'CommunicatorModule', section: 'quotidien', icon: 'mail' },
       { name: 'analytics', title: 'Analytics', page: 'analytics', module: 'AnalyticsModule', section: 'techniques', icon: 'pie' }
-      // ... Ajoutez le reste de vos routes
+      
+{ name: 'clients', title: 'Fiches Clients', page: 'clients', module: 'ClientsModule', section: 'quotidien', icon: 'building' },
     ];
     routes.forEach(r => Router.register(r.name, r));
   },
