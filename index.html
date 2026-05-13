@@ -1,59 +1,408 @@
-<script type="text/template" id="tpl-craminator">
-<div id="page-craminator">
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyrias Buddy — Portail Modulaire</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="assets/css/main.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.default.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+</head>
+<body>
+
+<script>
+// Prévention du flash blanc (FOUC) au chargement en mode sombre
+(function(){try{var s=localStorage.getItem('cyrias_app_theme');var t=s?JSON.parse(s):(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();
+</script>
+
+<div class="app">
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand">
+                <div class="brand-logo">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                        <polyline points="9 12 12 15 17 10"/>
+                    </svg>
+                </div>
+                <div class="brand-name">CYR<span>IAS</span> Bud<span>dy</span></div>
+            </div>
+            <button class="sidebar-collapse-btn" id="sidebar-collapse-btn" title="Réduire / déplier (Ctrl+B)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/>
+                </svg>
+            </button>
+            <button class="theme-toggle" id="toggle-theme" title="Basculer thème">
+                <span id="theme-icon"></span>
+            </button>
+        </div>
+
+        <div class="sidebar-nav">
+            <button class="nav-search-btn" onclick="Toast.info('Recherche Ctrl+K')">
+                <span class="nav-search-label">🔍 Recherche rapide</span>
+                <kbd>Ctrl+K</kbd>
+            </button>
+
+            <div class="nav-section" data-section="quotidien">
+                <div class="nav-section-title">Espace quotidien</div>
+                <button data-route="dashboard" class="nav-item active" onclick="navigateTo('dashboard')"><span class="nav-icon">🏠</span> Accueil</button>
+                <button data-route="clients" class="nav-item" onclick="navigateTo('clients')"><span class="nav-icon">🏢</span> Espace Client 360</button>
+                <button data-route="organisator" class="nav-item" onclick="navigateTo('organisator')"><span class="nav-icon">📅</span> Organisator</button>
+                <button data-route="journal" class="nav-item" onclick="navigateTo('journal')"><span class="nav-icon">📓</span> Journal de bord</button>
+                <button data-route="notifcenter" class="nav-item" onclick="navigateTo('notifcenter')"><span class="nav-icon">🔔</span> Alertes</button>
+                <button data-route="communicator" class="nav-item" onclick="navigateTo('communicator')"><span class="nav-icon">✉️</span> Communicator</button>
+                <button data-route="links" class="nav-item" onclick="navigateTo('links')"><span class="nav-icon">🔗</span> Tous les liens</button>
+            </div>
+
+            <div class="nav-section" data-section="pilotage">
+                <div class="nav-section-title">Pilotage</div>
+                <button data-route="direction" class="nav-item" onclick="navigateTo('direction')"><span class="nav-icon">📈</span> Board Direction</button>
+                <button data-route="craminator" class="nav-item" onclick="navigateTo('craminator')"><span class="nav-icon">📊</span> CRAminator</button>
+                <button data-route="facturator" class="nav-item" onclick="navigateTo('facturator')"><span class="nav-icon">💶</span> Facturator</button>
+                <button data-route="agregator" class="nav-item" onclick="navigateTo('agregator')"><span class="nav-icon">🏗️</span> Stafiz Agregator</button>
+                <button data-route="kanban" class="nav-item" onclick="navigateTo('kanban')"><span class="nav-icon">📋</span> Kanban & MEP</button>
+            </div>
+
+            <div class="nav-section" data-section="techniques">
+                <div class="nav-section-title">Outils techniques</div>
+                <button data-route="snippets" class="nav-item" onclick="navigateTo('snippets')"><span class="nav-icon">💻</span> Snippetator</button>
+                <button data-route="sql" class="nav-item" onclick="navigateTo('sql')"><span class="nav-icon">⚡</span> SQL Generator</button>
+                <button data-route="loganalyzer" class="nav-item" onclick="navigateTo('loganalyzer')"><span class="nav-icon">🐛</span> LOG Analyzor</button>
+                <button data-route="xmlviewer" class="nav-item" onclick="navigateTo('xmlviewer')"><span class="nav-icon">🧩</span> Ivalua Context</button>
+                <button data-route="bible" class="nav-item" onclick="navigateTo('bible')"><span class="nav-icon">📖</span> TMA Formator</button>
+                <button data-route="analytics" class="nav-item" onclick="navigateTo('analytics')"><span class="nav-icon">🥧</span> Analytics & Vélocité</button>
+                <button data-route="errortracker" class="nav-item" onclick="navigateTo('errortracker')"><span class="nav-icon">⚠️</span> Error Tracker</button>
+                <button data-route="gitcicd" class="nav-item" onclick="navigateTo('gitcicd')"><span class="nav-icon">🔀</span> Git & CI/CD</button>
+            </div>
+        </div>
+
+        <div class="nav-footer">
+            <button data-route="config" class="nav-item" id="nav-config" onclick="navigateTo('config')">
+                <span class="nav-icon">⚙️</span> Configuration
+            </button>
+        </div>
+    </nav>
+
+    <button class="sidebar-toggle-btn" id="toggle-menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>
+    </button>
+
+    <main class="main-content" id="content"></main>
+</div>
+
+<button class="scratchpad-btn" onclick="document.getElementById('scratchpad-panel').classList.toggle('open')" title="Bloc-notes éphémère">📝</button>
+<div class="scratchpad-panel" id="scratchpad-panel">
+  <div class="scratchpad-header">
+    <span>📝 Bloc-notes rapide</span>
+    <button onclick="document.getElementById('scratchpad-panel').classList.remove('open')" style="background:none;border:none;color:white;cursor:pointer;">×</button>
+  </div>
+  <textarea id="scratchpad-text" class="scratchpad-area" placeholder="Collez vos logs, IDs, requêtes temporaires ici..." oninput="localStorage.setItem('cyrias_scratchpad', this.value)"></textarea>
+</div>
+
+
+<script type="text/template" id="tpl-dashboard">
+    <div class="hero-section">
+        <div id="home-welcome-banner" style="padding: 28px 40px 12px 40px;">
+            <h1 style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:700;color:var(--primary);margin:0;">
+                <span id="home-greeting">Bonjour</span> <span id="home-username" style="color:var(--secondary-dark);"></span>
+            </h1>
+        </div>
+        <h3 class="section-title">Vos indicateurs</h3>
+        <div class="content-grid" id="home-grid">
+            <div class="card p-6" style="border-left: 4px solid var(--info); cursor: pointer;" onclick="navigateTo('kanban')">
+                <div class="text-xs text-muted uppercase font-bold mb-2">Tickets ouverts</div>
+                <div class="text-2xl font-bold" id="dash-tickets">--</div>
+            </div>
+            <div class="card p-6" style="border-left: 4px solid var(--brand); cursor: pointer;" onclick="navigateTo('craminator')">
+                <div class="text-xs text-muted uppercase font-bold mb-2">Jours saisis ce mois</div>
+                <div class="text-2xl font-bold" id="dash-cra">--</div>
+            </div>
+            <div class="card p-6" style="border-left: 4px solid var(--ok); cursor: pointer;" onclick="navigateTo('organisator')">
+                <div class="text-xs text-muted uppercase font-bold mb-2">Tâches du jour</div>
+                <div class="text-2xl font-bold" id="dash-tasks">--</div>
+            </div>
+        </div>
+        <h3 class="section-title">Liens rapides</h3>
+        <div id="home-links-container" class="content-grid" style="padding: 0 40px;"></div>
     </div>
 </script>
 
 <script type="text/template" id="tpl-clients">
-<div id="page-clients">
-    <div class="page-header">
-        <h1>🏢 Espace Client 360</h1>
-        <p>Pilotage commercial, financier et suivi hebdomadaire</p>
-    </div>
-    
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-4">
-        <div class="card p-4 md:col-span-1">
-            <input type="text" id="search-client-360" oninput="ClientsModule.renderList()" placeholder="Rechercher un client..." class="input mb-4">
-            <div id="client-360-list" class="flex flex-col gap-2 overflow-y-auto" style="max-height: 60vh;"></div>
+    <div id="page-clients">
+        <div class="page-header">
+            <div>
+                <h1>🏢 Espace Client 360</h1>
+                <p>Pilotage commercial, financier et suivi hebdomadaire</p>
+            </div>
         </div>
-
-        <div class="md:col-span-3">
-            <div id="client-360-placeholder" class="card empty-state">
-                <div class="empty-state-icon">🏢</div>
-                <div class="empty-state-text">Sélectionnez un client pour voir sa fiche complète</div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-4" style="padding: 0 40px;">
+            <div class="card p-4 md:col-span-1" style="height: fit-content;">
+                <input type="text" id="search-client-360" oninput="ClientsModule.renderList()" placeholder="Rechercher un client..." class="input mb-4">
+                <div id="client-360-list" class="flex flex-col gap-2 overflow-y-auto" style="max-height: 60vh;"></div>
             </div>
 
-            <div id="client-360-content" class="is-hidden">
-                <div class="flex gap-4 mb-4 border-b border-divider">
-                    <button class="btn btn-ghost active" onclick="ClientsModule.switchSubTab('suivi')">Suivi Hebdo</button>
-                    <button class="btn btn-ghost" onclick="ClientsModule.switchSubTab('stats')">Conso & Stats</button>
+            <div class="md:col-span-3">
+                <div id="client-360-placeholder" class="card empty-state">
+                    <div class="empty-state-icon">🏢</div>
+                    <div class="empty-state-text">Sélectionnez un client dans la liste pour voir sa fiche complète</div>
                 </div>
 
-                <div id="subtab-suivi">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="card p-4">
-                            <h3 class="card-title mb-4">✍️ Nouveau point</h3>
-                            <div class="form-group">
-                                <label class="label">Sujets en cours</label>
-                                <textarea id="suivi-sujets" class="textarea" placeholder="Actions réalisées..."></textarea>
+                <div id="client-360-content" class="is-hidden">
+                    <div class="flex gap-4 mb-4" style="border-bottom: 1px solid var(--border);">
+                        <button class="btn btn-ghost active" onclick="ClientsModule.switchSubTab('suivi')" id="tab-btn-suivi" style="border-bottom: 2px solid var(--brand); border-radius: 0;">Suivi Hebdo</button>
+                        <button class="btn btn-ghost" onclick="ClientsModule.switchSubTab('stats')" id="tab-btn-stats" style="border-radius: 0;">Conso & Stats</button>
+                    </div>
+
+                    <div id="subtab-suivi">
+                        <div class="grid grid-2 gap-6">
+                            <div class="card p-4">
+                                <h3 class="card-title mb-4">✍️ Nouveau point hebdomadaire</h3>
+                                <div class="form-group">
+                                    <label class="label">Sujets en cours / Avancement</label>
+                                    <textarea id="suivi-sujets" class="textarea" placeholder="Actions réalisées cette semaine..."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="label">Points d'attention / Alertes</label>
+                                    <textarea id="suivi-attention" class="textarea" placeholder="Risques, blocages, alertes..."></textarea>
+                                </div>
+                                <button class="btn btn-primary w-full" onclick="ClientsModule.addNote()">Enregistrer la note</button>
                             </div>
-                            <div class="form-group">
-                                <label class="label">Points d'attention</label>
-                                <textarea id="suivi-attention" class="textarea" placeholder="Blocages, risques..."></textarea>
+                            <div class="card p-4">
+                                <h3 class="card-title mb-4">📜 Historique</h3>
+                                <div id="suivi-history-list" class="flex flex-col gap-4 overflow-y-auto" style="max-height: 500px;"></div>
                             </div>
-                            <button class="btn btn-primary w-full" onclick="ClientsModule.addNote()">Enregistrer la note</button>
                         </div>
-                        <div class="card p-4">
-                            <h3 class="card-title mb-4">📜 Historique</h3>
-                            <div id="suivi-history-list" class="flex flex-col gap-4"></div>
+                    </div>
+
+                    <div id="subtab-stats" class="is-hidden">
+                        <div class="card p-6 text-center text-muted">
+                            Les données financières (TJM, budget) et le détail du CRA pour ce client arriveront ici prochainement.
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</script>
 
-                <div id="subtab-stats" class="is-hidden">
-                    <div class="card p-4">Chargement des données CRA...</div>
+<script type="text/template" id="tpl-craminator">
+    <div id="page-craminator" style="display:block !important; position:relative; left:0; height:auto; overflow:visible; opacity:1;">
+        <div class="page-header" style="padding-bottom: 20px; background: var(--surface); border-bottom: 1px solid var(--border);">
+            <div>
+                <h1 style="font-family: 'Fraunces', serif; font-size: 28px; font-weight: 800; color: var(--primary);">CRAminator</h1>
+                <p style="color: var(--ink-muted); font-size: 14px; margin-top: 4px;">Outil de suivi TMA & Analyse des temps (CRA)</p>
+            </div>
+        </div>
+
+        <div class="container mx-auto px-4 py-4" style="max-width: 1400px; margin: 0 auto;">
+            <div id="upload-section">
+                <div id="source-manager" class="hidden mb-6">
+                    <div class="card p-5" style="background: linear-gradient(135deg, rgba(94, 176, 145, 0.05), rgba(27, 59, 92, 0.05)); border: 1px solid var(--border);">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-sm font-bold text-primary">Sources de données</h3>
+                                <p class="text-xs text-muted"><span id="source-count">0</span> source(s) chargée(s) — <span id="total-records-count" class="font-mono">0</span> lignes</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <label class="btn btn-outline text-xs cursor-pointer">
+                                    + Ajouter
+                                    <input type="file" class="hidden" accept=".xlsx,.xls,.csv" multiple onchange="CRAModule.handleFiles(event)" style="display:none;">
+                                </label>
+                                <button onclick="CRAModule.clearData()" class="btn btn-danger text-xs">Tout effacer</button>
+                            </div>
+                        </div>
+                        <div id="source-chips" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+
+                <div id="drop-zone" class="card p-12 text-center max-w-3xl mx-auto" style="border: 2px dashed var(--border); background: var(--bg);">
+                    <h2 class="text-xl font-bold mb-2 text-primary">Importez vos fichiers Stafiz bruts</h2>
+                    <p class="text-sm mb-4 text-secondary">Glissez un ou plusieurs fichiers .xlsx / .csv</p>
+                    <label class="btn btn-primary cursor-pointer">
+                        Parcourir mes fichiers
+                        <input type="file" id="file-upload" class="hidden" accept=".xlsx,.xls,.csv" multiple onchange="CRAModule.handleFiles(event)" style="display:none;">
+                    </label>
+                </div>
+            </div>
+
+            <div id="dashboard-section" class="hidden">
+                <div class="sticky py-3 mb-5" style="top: 80px; z-index: 40; background: rgba(255, 255, 255, 0.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="CRAModule.switchTab('dashboard')" id="btn-tab-dashboard" class="btn btn-primary text-xs">Dashboard</button>
+                        <button onclick="CRAModule.switchTab('explorer')" id="btn-tab-explorer" class="btn btn-outline text-xs">Explorateur</button>
+                        <button onclick="CRAModule.openFilters()" class="btn btn-ghost text-xs font-bold" style="color: var(--brand);">Filtrer 🔍</button>
+                    </div>
+                </div>
+
+                <div id="dashboard-content">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                        <div class="card p-5"><h3 class="text-sm font-bold mb-3">Jours par Client</h3><div style="height:250px;"><canvas id="clientChart"></canvas></div></div>
+                        <div class="card p-5"><h3 class="text-sm font-bold mb-3">Jours par Collaborateur</h3><div style="height:250px;"><canvas id="collabChart"></canvas></div></div>
+                        <div class="card p-5"><h3 class="text-sm font-bold mb-3">Répartition par Tâche</h3><div style="height:250px;"><canvas id="taskChart"></canvas></div></div>
+                    </div>
+                </div>
+
+                <div id="explorer-content" class="hidden">
+                    <div class="card p-5 overflow-x-auto">
+                        <table class="table min-w-full">
+                            <thead><tr><th>Date</th><th>Client</th><th>Collaborateur</th><th>Jours</th><th>Tâche</th></tr></thead>
+                            <tbody id="explorer-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="filters-modal" class="modal-overlay hidden">
+            <div class="modal w-full max-w-4xl">
+                <div class="modal-header">
+                    <h3>Filtres d'analyse</h3>
+                    <button onclick="CRAModule.closeFilters()" class="btn btn-ghost btn-sm">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label class="label">Client</label><select id="filter-client" multiple></select></div>
+                        <div><label class="label">Collaborateur</label><select id="filter-collab" multiple></select></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="CRAModule.closeFilters()" class="btn btn-primary">Appliquer</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </script>
+
+<script type="text/template" id="tpl-kanban">
+    <div class="page-header">
+        <div><h1>📋 Kanban & MEP</h1><p>Suivi des tickets et livraisons</p></div>
+        <button class="btn btn-primary" onclick="alert('Module complet en cours de migration')">+ Nouveau Ticket</button>
+    </div>
+    <div class="kanban-board" style="padding: 20px 40px;">
+        <div class="kanban-col"><div class="kanban-col-header"><span class="kanban-col-title">À qualifier</span></div><div class="kanban-empty">Vide</div></div>
+        <div class="kanban-col"><div class="kanban-col-header"><span class="kanban-col-title">En Dev</span></div><div class="kanban-empty">Vide</div></div>
+        <div class="kanban-col"><div class="kanban-col-header"><span class="kanban-col-title">UAT</span></div><div class="kanban-empty">Vide</div></div>
+        <div class="kanban-col"><div class="kanban-col-header"><span class="kanban-col-title">MEP</span></div><div class="kanban-empty">Vide</div></div>
+    </div>
+</script>
+
+<script type="text/template" id="tpl-facturator">
+    <div class="page-header">
+        <div><h1>💶 Facturator</h1><p>Suivi administratif des missions</p></div>
+    </div>
+    <div class="card m-10 p-10 text-center">
+        <h2>Module en construction dans la v23 modulaire</h2>
+    </div>
+</script>
+
+<script type="text/template" id="tpl-analytics">
+    <div class="page-header">
+        <div><h1>📊 Analytics & Vélocité</h1><p>Statistiques de productivité</p></div>
+        <button class="btn btn-outline" id="ana-refresh">🔄 Actualiser</button>
+    </div>
+    <div class="tools-container">
+        <div class="stat-grid">
+            <div class="stat"><div class="stat-label">Tâches 30J</div><div class="stat-value" id="ana-tasks-30">0</div></div>
+            <div class="stat"><div class="stat-label">Terminées</div><div class="stat-value text-ok" id="ana-done-30">0</div></div>
+            <div class="stat"><div class="stat-label">Vélocité</div><div class="stat-value" id="ana-velocity">0</div></div>
+            <div class="stat"><div class="stat-label">Journal</div><div class="stat-value" id="ana-journal-30">0</div></div>
+        </div>
+        <div class="grid grid-2 mt-4">
+            <div class="card"><div class="card-header"><h3>Statut des tâches</h3></div><div class="card-body" style="height:280px"><canvas id="chart-tasks"></canvas></div></div>
+            <div class="card"><div class="card-header"><h3>Activité (30j)</h3></div><div class="card-body" style="height:280px"><canvas id="chart-activity"></canvas></div></div>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="tpl-bible">
+    <div class="page-header">
+        <div><h1>📖 TMA Formator</h1><p>Base de connaissances opérationnelle</p></div>
+        <button class="btn btn-primary" id="bible-new">+ Nouvel Article</button>
+    </div>
+    <div class="tools-container flex gap-4">
+        <div id="bible-cats" style="width:200px;"></div>
+        <div id="bible-content" class="flex-1"></div>
+    </div>
+</script>
+
+<script type="text/template" id="tpl-agregator">
+    <div class="page-header">
+        <div><h1>🏗️ Stafiz Agregator</h1><p>Gestion des sources de données</p></div>
+        <div class="flex gap-2">
+            <button class="btn btn-outline" id="agr-import">📥 Importer</button>
+            <button class="btn btn-primary" id="agr-new">+ Nouvelle Source</button>
+        </div>
+    </div>
+    <div class="tools-container">
+        <div class="stat-grid">
+            <div class="stat"><div class="stat-label">Sources</div><div class="stat-value" id="agr-sources">0</div></div>
+            <div class="stat"><div class="stat-label">Lignes</div><div class="stat-value" id="agr-records">0</div></div>
+            <div class="stat"><div class="stat-label">Dernière synchro</div><div class="stat-value" id="agr-last" style="font-size:14px">—</div></div>
+        </div>
+        <div id="agr-list" class="mt-4"></div>
+    </div>
+</script>
+
+<script type="text/template" id="tpl-communicator">
+    <div class="page-header">
+        <div><h1>✉️ Communicator</h1><p>Modèles de messages bilingues</p></div>
+        <button class="btn btn-primary" id="com-new">+ Nouveau Modèle</button>
+    </div>
+    <div class="tools-container">
+        <input type="text" id="com-search" class="input mb-4" placeholder="Rechercher un modèle...">
+        <div class="grid grid-2" id="com-list"></div>
+    </div>
+</script>
+
+<script type="text/template" id="tpl-config">
+    <div class="page-header"><h1>⚙️ Configuration</h1></div>
+    <div class="tools-container grid grid-2">
+        <div class="card">
+            <div class="card-header"><h3>Données (Local Storage)</h3></div>
+            <div class="card-body">
+                <button class="btn btn-outline w-full mb-2" id="btn-export">⬇️ Exporter Sauvegarde (JSON)</button>
+                <button class="btn btn-outline w-full mb-2" id="btn-import">⬆️ Importer Sauvegarde</button>
+                <button class="btn btn-danger w-full mt-4" onclick="Storage.clearAll(); location.reload();">🗑️ Vider toute la mémoire</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/router.js"></script>
+
+<script src="modules/agregator.js"></script>
+<script src="modules/analytics.js"></script>
+<script src="modules/bible.js"></script>
+<script src="modules/communicator.js"></script>
+
+<script src="assets/js/app.js"></script>
+
+<script>
+    function navigateTo(page) { Router.navigate(page); }
+    function toggleNavSection(name) {
+        const sec = document.querySelector(`.nav-section[data-section="${name}"]`);
+        if (sec) sec.classList.toggle('nav-collapsed');
+    }
+    function openGlobalSearch() { if(window.Toast) Toast.info("Recherche bientôt disponible"); }
+    
+    // Scratchpad Auto-restore
+    window.addEventListener('DOMContentLoaded', () => {
+        const sp = document.getElementById('scratchpad-text');
+        if (sp) sp.value = localStorage.getItem('cyrias_scratchpad') || '';
+    });
+</script>
+
+</body>
+</html>
