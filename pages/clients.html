@@ -21,7 +21,7 @@
             <div>
                 <div id="client-360-placeholder" class="card empty-state">
                     <div class="empty-state-icon">🏢</div>
-                    <div class="empty-state-text">Sélectionnez un client dans la liste pour voir sa fiche complète</div>
+                    <div class="empty-state-text">Sélectionnez un client dans la liste</div>
                 </div>
 
                 <div id="client-360-content" class="is-hidden">
@@ -36,12 +36,12 @@
                                 <div class="card-header"><h3>✍️ Nouveau point</h3></div>
                                 <div class="card-body">
                                     <div class="form-group">
-                                        <label class="label">Sujets en cours / Avancement</label>
+                                        <label class="label">Sujets en cours</label>
                                         <textarea id="suivi-sujets" class="textarea" placeholder="Actions réalisées cette semaine..."></textarea>
                                     </div>
                                     <div class="form-group">
-                                        <label class="label">Points d'attention / Alertes</label>
-                                        <textarea id="suivi-attention" class="textarea" placeholder="Risques, blocages, alertes..."></textarea>
+                                        <label class="label">Points d'attention</label>
+                                        <textarea id="suivi-attention" class="textarea" placeholder="Risques, blocages..."></textarea>
                                     </div>
                                     <button class="btn btn-primary w-full" onclick="ClientsModule.addNote()">Enregistrer la note</button>
                                 </div>
@@ -56,11 +56,9 @@
                     </div>
 
                     <div id="subtab-stats" class="is-hidden">
-                        <div class="card">
-                            <div class="card-body empty-state">
-                                <div class="empty-state-icon">🚧</div>
-                                <div class="empty-state-text">Données financières en cours de liaison...</div>
-                            </div>
+                        <div class="card p-6 text-center text-muted">
+                            <h3>Module en construction</h3>
+                            <p>Les indicateurs TJM, budgets et KPI financiers pour ce client seront affichés ici.</p>
                         </div>
                     </div>
                 </div>
