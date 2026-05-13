@@ -106,6 +106,20 @@ const CRAModule = {
             const m = {};
             this.rawData.forEach(r => { if(!m[r[key]]) m[r[key]]=0; m[r[key]]+=r.jours; });
             return Object.entries(m).map(([name, value]) => ({name, value})).sort((a,b)=>b.value-a.value);
+        // Mise à jour dynamique des badges de la toolbar
+        const linesBadge = document.getElementById('cra-lines-badge');
+        if (linesBadge) linesBadge.textContent = `${this.rawData.length} lignes`;
+
+        const caBadge = document.getElementById('cra-ca-badge');
+        if (caBadge) {
+            let totalCA = 0;
+            this.rawData.forEach(r => {
+                const tjm = tjmSettings[r.client] || this.defaultTJM;
+                totalCA += r.jours * tjm;
+            });
+            // Format avec espaces pour les milliers (ex: 350 731 €)
+            caBadge.textContent = `CA: ${totalCA.toLocaleString('fr-FR')} €`;
+        }
         };
 
         const draw = (id, data, type, options = {}) => {
@@ -156,9 +170,16 @@ const CRAModule = {
         }
     },
 
-    switchTab(tab) {
+   switchTab(tab) {
+        // Gérer l'affichage des panneaux
         document.getElementById('dashboard-content').style.display = tab === 'dashboard' ? 'flex' : 'none';
         document.getElementById('explorer-content').style.display = tab === 'explorer' ? 'block' : 'none';
+        
+        // Gérer le bouton actif de la toolbar
+        document.querySelectorAll('.btn-tool').forEach(btn => btn.classList.remove('active'));
+        if (tab === 'dashboard') document.getElementById('btn-tab-dashboard')?.classList.add('active');
+        if (tab === 'explorer') document.getElementById('btn-tab-explorer')?.classList.add('active');
+
         if(tab === 'explorer') this.renderExplorer();
     },
 
