@@ -6,17 +6,18 @@
     <title>Cyrias Buddy — Portail Modulaire</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="assets/css/main.css">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.default.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 </head>
 <body>
 
 <script>
-// Prévention du flash blanc (FOUC) au chargement en mode sombre
+// Prévention du flash blanc au chargement en mode sombre
 (function(){try{var s=localStorage.getItem('cyrias_app_theme');var t=s?JSON.parse(s):(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();
 </script>
 
@@ -26,8 +27,7 @@
             <div class="brand">
                 <div class="brand-logo">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-                        <polyline points="9 12 12 15 17 10"/>
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56"/><polyline points="9 12 12 15 17 10"/>
                     </svg>
                 </div>
                 <div class="brand-name">CYR<span>IAS</span> Bud<span>dy</span></div>
@@ -147,22 +147,201 @@
   <textarea id="scratchpad-text" class="scratchpad-area" placeholder="Collez vos logs, IDs, requêtes temporaires ici..." oninput="localStorage.setItem('cyrias_scratchpad', this.value)"></textarea>
 </div>
 
+<script type="text/template" id="tpl-dashboard">
+    <div class="hero-section">
+        <div id="home-welcome-banner" style="padding: 28px 40px 12px 40px;">
+            <h1 style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:700;color:var(--primary);margin:0;letter-spacing:-0.5px;">
+                <span id="home-greeting">Bonjour</span> <span id="home-username" style="color:var(--secondary-dark);"></span>
+            </h1>
+            <p id="home-date" style="font-size:13px;color:var(--ink-muted);margin-top:4px;text-transform:capitalize;"></p>
+        </div>
+
+        <h3 class="section-title">Vos indicateurs</h3>
+        <div class="content-grid" id="home-grid">
+            <div class="card p-6" style="border-left: 4px solid var(--info); cursor: pointer;" onclick="navigateTo('kanban')">
+                <div class="text-xs text-muted uppercase font-bold mb-2">Tickets Kanban</div>
+                <div class="text-2xl font-bold" id="dash-tickets">--</div>
+            </div>
+            <div class="card p-6" style="border-left: 4px solid var(--brand); cursor: pointer;" onclick="navigateTo('craminator')">
+                <div class="text-xs text-muted uppercase font-bold mb-2">Jours saisis ce mois</div>
+                <div class="text-2xl font-bold" id="dash-cra">--</div>
+            </div>
+            <div class="card p-6" style="border-left: 4px solid var(--warn); cursor: pointer;" onclick="navigateTo('organisator')">
+                <div class="text-xs text-muted uppercase font-bold mb-2">Tâches du jour</div>
+                <div class="text-2xl font-bold" id="dash-tasks">--</div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="tpl-clients">
+    <div class="page-header">
+        <div>
+            <h1>🏢 Espace Client 360</h1>
+            <p>Pilotage commercial, financier et suivi hebdomadaire</p>
+        </div>
+    </div>
+    
+    <div class="tools-container grid" style="grid-template-columns: 280px 1fr; gap: 24px;">
+        <div class="card" style="height: fit-content;">
+            <div class="card-header"><h3>Clients</h3></div>
+            <div class="card-body">
+                <input type="text" id="search-client-360" oninput="ClientsModule.renderList()" placeholder="Rechercher..." class="form-input mb-4">
+                <div id="client-360-list" class="flex flex-col gap-2 overflow-y-auto" style="max-height: 60vh;"></div>
+            </div>
+        </div>
+
+        <div>
+            <div id="client-360-placeholder" class="card empty-state">
+                <div class="empty-state-icon">🏢</div>
+                <div class="empty-state-text">Sélectionnez un client dans la liste pour voir sa fiche</div>
+            </div>
+
+            <div id="client-360-content" class="is-hidden">
+                <div class="flex gap-2 mb-4" style="border-bottom: 1px solid var(--divider); padding-bottom: 8px;">
+                    <button class="btn btn-ghost active" onclick="ClientsModule.switchSubTab('suivi')" id="tab-btn-suivi" style="border-bottom: 2px solid var(--brand); border-radius: 0;">📝 Suivi Hebdo</button>
+                    <button class="btn btn-ghost" onclick="ClientsModule.switchSubTab('stats')" id="tab-btn-stats" style="border-radius: 0;">📊 Conso & Stats</button>
+                </div>
+
+                <div id="subtab-suivi">
+                    <div class="grid grid-2 gap-4">
+                        <div class="card">
+                            <div class="card-header"><h3>✍️ Nouveau point</h3></div>
+                            <div class="card-body">
+                                <label class="form-label">Sujets en cours</label>
+                                <textarea id="suivi-sujets" class="form-input mb-4" style="min-height: 80px;" placeholder="Actions réalisées..."></textarea>
+                                
+                                <label class="form-label">Points d'attention</label>
+                                <textarea id="suivi-attention" class="form-input mb-4" style="min-height: 80px;" placeholder="Risques, alertes..."></textarea>
+                                
+                                <button class="btn btn-primary w-full" onclick="ClientsModule.addNote()">Enregistrer la note</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><h3>📜 Historique</h3></div>
+                            <div class="card-body" style="padding: 0;">
+                                <div id="suivi-history-list" class="flex flex-col gap-4 overflow-y-auto" style="max-height: 500px; padding: 16px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="subtab-stats" class="is-hidden card empty-state">
+                    <div class="empty-state-icon">🚧</div>
+                    <div class="empty-state-text">Les données de temps et facturation arriveront ici.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="tpl-craminator">
+    <div id="page-craminator" style="display:block !important; position:relative; left:0; height:auto; overflow:visible; opacity:1;">
+        <div class="page-header" style="padding-bottom: 20px; background: var(--surface); border-bottom: 1px solid var(--border);">
+            <div>
+                <h1 style="font-family: 'Fraunces', serif; font-size: 28px; font-weight: 800; color: var(--primary);">CRAminator</h1>
+                <p style="color: var(--ink-muted); font-size: 14px; margin-top: 4px;">Outil de suivi TMA & Analyse des temps (CRA)</p>
+            </div>
+        </div>
+
+        <div class="container mx-auto px-4 py-4" style="max-width: 1400px; margin: 0 auto;">
+            <div id="upload-section">
+                <div id="source-manager" class="is-hidden mb-6 card p-5" style="background: linear-gradient(135deg, rgba(94, 176, 145, 0.05), rgba(27, 59, 92, 0.05)); border: 1px solid var(--border);">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-sm font-bold text-primary">Sources de données</h3>
+                            <p class="text-xs text-muted"><span id="source-count">0</span> source(s) chargée(s) — <span id="total-records-count" class="font-mono">0</span> lignes</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <label class="btn btn-outline text-xs cursor-pointer">
+                                + Ajouter
+                                <input type="file" class="is-hidden" accept=".xlsx,.xls,.csv" multiple onchange="CRAModule.handleFiles(event)" style="display:none;">
+                            </label>
+                            <button onclick="CRAModule.clearData()" class="btn btn-danger text-xs">Tout effacer</button>
+                        </div>
+                    </div>
+                    <div id="source-chips" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <div id="drop-zone" class="card p-12 text-center max-w-3xl mx-auto" style="border: 2px dashed var(--brand); background: var(--bg);">
+                    <h2 class="text-xl font-bold mb-2 text-primary">Importez vos fichiers Stafiz bruts</h2>
+                    <label class="btn btn-primary cursor-pointer mt-4">
+                        Parcourir mes fichiers
+                        <input type="file" class="is-hidden" accept=".xlsx,.xls,.csv" multiple onchange="CRAModule.handleFiles(event)" style="display:none;">
+                    </label>
+                </div>
+            </div>
+
+            <div id="dashboard-section" class="is-hidden">
+                <div class="sticky py-3 mb-5" style="top: 80px; z-index: 40; background: rgba(255, 255, 255, 0.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="CRAModule.switchTab('dashboard')" id="btn-tab-dashboard" class="btn btn-primary text-xs">Dashboard</button>
+                        <button onclick="CRAModule.switchTab('explorer')" id="btn-tab-explorer" class="btn btn-outline text-xs">Explorateur</button>
+                        <button onclick="CRAModule.openFilters()" class="btn btn-ghost text-xs font-bold" style="color: var(--brand);">Filtrer 🔍</button>
+                    </div>
+                </div>
+
+                <div id="dashboard-content">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                        <div class="card p-5"><h3 class="text-sm font-bold mb-3">Jours par Client</h3><div style="height:250px;"><canvas id="clientChart"></canvas></div></div>
+                        <div class="card p-5"><h3 class="text-sm font-bold mb-3">Jours par Collaborateur</h3><div style="height:250px;"><canvas id="collabChart"></canvas></div></div>
+                        <div class="card p-5"><h3 class="text-sm font-bold mb-3">Répartition par Tâche</h3><div style="height:250px;"><canvas id="taskChart"></canvas></div></div>
+                    </div>
+                </div>
+
+                <div id="explorer-content" class="is-hidden">
+                    <div class="card p-5 overflow-x-auto">
+                        <table class="table min-w-full">
+                            <thead><tr><th>Date</th><th>Client</th><th>Collaborateur</th><th>Jours</th><th>Tâche</th></tr></thead>
+                            <tbody id="explorer-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="filters-modal" class="modal-overlay is-hidden">
+            <div class="modal w-full max-w-4xl">
+                <div class="modal-header">
+                    <h3>Filtres d'analyse</h3>
+                    <button onclick="CRAModule.closeFilters()" class="btn btn-ghost btn-sm">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label class="form-label">Client</label><select id="filter-client" multiple></select></div>
+                        <div><label class="form-label">Collaborateur</label><select id="filter-collab" multiple></select></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="CRAModule.closeFilters()" class="btn btn-primary">Appliquer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="tpl-generic">
+    <div class="page-header">
+        <h1>Module en construction</h1>
+    </div>
+    <div class="card p-6 text-center text-muted">
+        <p>Ce module est actuellement en cours de développement ou n'a pas encore de template défini.</p>
+    </div>
+</script>
+
 <script>
-    // Ces fonctions assurent la liaison entre le HTML et le Javascript
-    function navigateTo(page) { 
+    function navigateTo(page) {
         if (window.Router) {
-            Router.navigate(page); 
+            Router.navigate(page);
         } else {
-            console.error("Router n'est pas encore initialisé");
+            console.error("Router n'est pas encore chargé");
         }
     }
 
-    // Gestion de l'accordéon des menus
     function toggleNavSection(name) {
         const sec = document.querySelector(`.nav-section[data-section="${name}"]`);
         if (sec) {
             sec.classList.toggle('nav-collapsed');
-            // Mémorisation de l'état (pour ne pas que ça se referme en changeant de page)
             const collapsed = JSON.parse(localStorage.getItem('cyrias_nav_collapsed') || '["techniques"]');
             if (sec.classList.contains('nav-collapsed')) {
                 if (!collapsed.includes(name)) collapsed.push(name);
@@ -174,31 +353,30 @@
         }
     }
 
-    // Restauration de l'état des menus au chargement
+    function openGlobalSearch() {
+        alert("La recherche globale (Ctrl+K) est en cours de développement.");
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
+        // Restauration de l'accordéon
         const collapsed = JSON.parse(localStorage.getItem('cyrias_nav_collapsed') || '["techniques"]');
         collapsed.forEach(name => {
             const sec = document.querySelector(`.nav-section[data-section="${name}"]`);
             if (sec) sec.classList.add('nav-collapsed');
         });
-        
-        // Restauration du contenu du scratchpad
+        // Restauration du Scratchpad
         const sp = document.getElementById('scratchpad-text');
         if (sp) sp.value = localStorage.getItem('cyrias_scratchpad') || '';
     });
-
-    function openGlobalSearch() { if(window.Toast) Toast.info("Recherche (Ctrl+K) bientôt disponible"); }
 </script>
 
 <script src="assets/js/storage.js"></script>
 <script src="assets/js/ui.js"></script>
 <script src="assets/js/router.js"></script>
 
-<script src="modules/agregator.js"></script>
-<script src="modules/analytics.js"></script>
-<script src="modules/bible.js"></script>
-<script src="modules/communicator.js"></script>
-
+<script src="modules/dashboard.js"></script>
+<script src="modules/clients.js"></script>
+<script src="modules/craminator.js"></script>
 <script src="assets/js/app.js"></script>
 
 </body>
