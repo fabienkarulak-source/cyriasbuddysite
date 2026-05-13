@@ -123,9 +123,112 @@
             </div>
         </div>
 
-        <div id="page-clients" class="page">
-            <h1>🏢 Espace Client 360</h1>
-            <div class="card" style="margin-top: 20px;">Contenu du module Client bientôt chargé...</div>
+       <div class="page" id="page-clients">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+                <div>
+                    <h1 style="font-family: 'Outfit'; font-size: 24px; color: var(--primary);">🏢 Espace Client 360</h1>
+                    <p style="color: var(--ink-muted); font-size: 13px; margin-top: 4px;">Sélectionnez un client pour analyser ses données et rédiger vos comptes-rendus.</p>
+                </div>
+                <div style="width: 300px;">
+                    <label style="font-size: 11px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase;">Client actif</label>
+                    <select id="client360-selector" onchange="ClientsModule.selectClient(this.value)" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-weight: 600; color: var(--primary); background: white; margin-top: 4px;"></select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; border-bottom: 1px solid var(--border); margin-bottom: 20px;">
+                <button id="tab-fiche" onclick="ClientsModule.switchTab('fiche')" style="padding: 10px 20px; font-weight: 600; border: none; background: transparent; border-bottom: 2px solid var(--brand); color: var(--brand); cursor: pointer;">Fiche d'identité & Indicateurs</button>
+                <button id="tab-suivi" onclick="ClientsModule.switchTab('suivi')" style="padding: 10px 20px; font-weight: 600; border: none; background: transparent; border-bottom: 2px solid transparent; color: var(--ink-muted); cursor: pointer;">Suivi Hebdo & Commentaires</button>
+            </div>
+
+            <div id="client360-empty" class="card" style="text-align: center; padding: 60px; color: var(--ink-muted);">
+                Veuillez sélectionner un client dans le menu déroulant.
+            </div>
+
+            <div id="client360-fiche" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <h2 id="fiche-client-name" style="font-family: 'Outfit'; font-size: 28px; color: var(--primary);">NOM DU CLIENT</h2>
+                        <p style="font-size: 12px; color: var(--ink-muted);">Fiche d'identité et indicateurs globaux sur la base complète</p>
+                        <div style="margin-top: 16px;">
+                            <span id="fiche-ca-total" style="font-size: 32px; font-weight: 800; color: #22c55e;">0 €</span>
+                            <div style="font-size: 11px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase;">CA Total Estimé</div>
+                        </div>
+                    </div>
+                    <div class="card" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px;">
+                        <div style="font-size: 12px; font-weight: 600; color: #3b82f6; margin-bottom: 8px;">📄 Export Word (Ce client)</div>
+                        <button onclick="ClientsModule.exportWord()" style="width: 100%; padding: 10px; background: #1e3a8a; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Télécharger la fiche</button>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                    <div>
+                        <h3 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">💼 Informations Commerciales</h3>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div><label style="font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase;">Contact Principal</label><input type="text" id="info-contact" onchange="ClientsModule.saveInfos()" class="form-input" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px;"></div>
+                            <div><label style="font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase;">Email / Téléphone</label><input type="text" id="info-email" onchange="ClientsModule.saveInfos()" class="form-input" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px;"></div>
+                            <div><label style="font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase;">Référence Contrat</label><input type="text" id="info-ref" onchange="ClientsModule.saveInfos()" class="form-input" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">📊 Indicateurs Opérationnels</h3>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <div style="display: flex; justify-content: space-between; padding: 12px; background: white; border: 1px solid var(--border); border-radius: 8px; align-items: center;">
+                                <span style="font-size: 13px; font-weight: 600;">TJM Actuel</span>
+                                <div><input type="number" id="info-tjm" onchange="ClientsModule.saveInfos()" style="width: 60px; padding: 4px 8px; border: 1px solid #eab308; border-radius: 4px; color: #eab308; font-weight: bold; text-align: right;"> €</div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 12px; background: white; border: 1px solid var(--border); border-radius: 8px;">
+                                <span style="font-size: 13px; font-weight: 600;">Jours Consommés Total</span><span id="fiche-jours" style="font-weight: 800; color: var(--primary);">0 jrs</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 12px; background: white; border: 1px solid var(--border); border-radius: 8px;">
+                                <span style="font-size: 13px; font-weight: 600;">Collaborateurs uniques</span><span id="fiche-collabs-count" style="font-weight: 800; color: var(--primary);">0</span>
+                            </div>
+                            <div style="padding: 12px; background: white; border: 1px solid var(--border); border-radius: 8px; font-size: 12px; color: var(--ink-muted);" id="fiche-collabs-list">
+                                </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                    <div class="card"><h3 style="font-size: 13px; margin-bottom: 16px;">Répartition par tâche</h3><div style="height: 200px; position: relative;"><canvas id="clientTaskChart"></canvas></div></div>
+                    <div class="card"><h3 style="font-size: 13px; margin-bottom: 16px;">Évolution des jours</h3><div style="height: 200px; position: relative;"><canvas id="clientTimeChart"></canvas></div></div>
+                </div>
+
+                <div class="card" style="padding: 0; overflow: hidden;">
+                    <div style="padding: 16px; border-bottom: 1px solid var(--border); background: #f8fafc;"><h3 style="font-size: 14px; font-weight: 700;">Missions & Budgets (Global)</h3></div>
+                    <table style="width: 100%; text-align: left; border-collapse: collapse; font-size: 12px;">
+                        <thead style="background: white; border-bottom: 1px solid var(--border); color: var(--ink-muted);"><tr><th style="padding: 12px 16px;">MISSION</th><th style="padding: 12px 16px; text-align: right;">CONSOMMÉS</th><th style="padding: 12px 16px; text-align: right;">CA GÉNÉRÉ</th></tr></thead>
+                        <tbody id="fiche-missions-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="client360-suivi" style="display: none; grid-template-columns: 350px 1fr; gap: 24px;">
+                <div class="card" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">📝 Nouveau commentaire</h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div><label style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">Semaine</label><input type="week" id="form-semaine" class="form-input" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px;"></div>
+                        <div><label style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">Catégorie</label>
+                            <select id="form-cat" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: white;">
+                                <option>Point général</option><option>Alerte / Escalade</option><option>Comité de Pilotage</option>
+                            </select>
+                        </div>
+                        <div><label style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">Participants</label><input type="text" id="form-parts" placeholder="ex: Marie, Thomas..." style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px;"></div>
+                        <div><label style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">État enveloppes (Budgets)</label><textarea id="form-env" rows="2" placeholder="Consommation vs Reste à faire..." style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px;"></textarea></div>
+                        <div><label style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">Sujets en cours / Avancement</label><textarea id="form-sujets" rows="3" placeholder="Actions réalisées cette semaine..." style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px;"></textarea></div>
+                        <div><label style="font-size: 10px; font-weight: 700; color: #059669; text-transform: uppercase;">Points d'attention / Alertes</label><textarea id="form-alertes" rows="2" placeholder="Risques identifiés, blocages..." style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px;"></textarea></div>
+                        <div><label style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">Auteur</label><input type="text" id="form-auteur" value="Compagnon" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f1f5f9;"></div>
+                        
+                        <button onclick="ClientsModule.saveComment()" style="width: 100%; padding: 12px; background: #1e3a5f; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 8px;">+ Ajouter le commentaire</button>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px;">📜 Historique des suivis</h3>
+                    <div id="suivi-history-list" style="display: flex; flex-direction: column; gap: 16px; overflow-y: auto; max-height: 800px; padding-right: 8px;">
+                        </div>
+                </div>
+            </div>
         </div>
 
        <div id="page-craminator" class="page">
