@@ -120,16 +120,33 @@
                     <button onclick="CRAModule.clearData()" style="padding: 8px 16px; background: #fee2e2; color: #ef4444; border: none; border-radius: 6px; cursor: pointer; margin-left: auto;">Tout effacer</button>
                 </div>
 
-                <div id="dashboard-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div class="card">
-                        <h3 style="margin-bottom: 15px;">Jours par Client</h3>
-                        <div style="height: 300px; position: relative;"><canvas id="clientChart"></canvas></div>
-                    </div>
-                    <div class="card">
-                        <h3 style="margin-bottom: 15px;">Répartition par Tâche</h3>
-                        <div style="height: 300px; position: relative;"><canvas id="taskChart"></canvas></div>
-                    </div>
-                </div>
+             <div id="dashboard-content" style="display: flex; flex-direction: column; gap: 20px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+        <div class="card">
+            <h3 style="font-size: 14px; margin-bottom: 10px;">👥 Par Collaborateur</h3>
+            <div style="height: 220px; position: relative;"><canvas id="collabChart"></canvas></div>
+        </div>
+        <div class="card">
+            <h3 style="font-size: 14px; margin-bottom: 10px;">🏢 Par Client</h3>
+            <div style="height: 220px; position: relative;"><canvas id="clientChart"></canvas></div>
+        </div>
+        <div class="card">
+            <h3 style="font-size: 14px; margin-bottom: 10px;">🔧 Par Tâche</h3>
+            <div style="height: 220px; position: relative;"><canvas id="taskChart"></canvas></div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+        <div class="card">
+            <h3 style="font-size: 14px; margin-bottom: 10px;">📈 Évolution de la charge (Jours / Mois)</h3>
+            <div style="height: 280px; position: relative;"><canvas id="timeChart"></canvas></div>
+        </div>
+        <div class="card">
+            <h3 style="font-size: 14px; margin-bottom: 10px;">💶 Estimation CA (basé sur TJM)</h3>
+            <div style="height: 280px; position: relative;"><canvas id="caChart"></canvas></div>
+        </div>
+    </div>
+</div>
 
                 <div id="explorer-content" class="card" style="display: none;">
                     <table style="width: 100%; text-align: left; border-collapse: collapse; font-size: 13px;">
