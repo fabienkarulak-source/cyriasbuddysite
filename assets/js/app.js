@@ -65,7 +65,8 @@ const App = {
     const routes = [
       // Section: Espace quotidien
       { name: 'dashboard', title: 'Accueil', page: 'dashboard', module: 'DashboardModule', section: 'quotidien', sectionTitle: 'Espace quotidien', icon: 'home' },
-      { name: 'clients', title: 'Espace Client 360', page: 'clients', module: 'ClientsModule', section: 'quotidien', icon: 'building' },
+     // Dans app.js, dans registerRoutes()
+{ name: 'clients', title: 'Espace Client 360', page: 'clients', module: 'ClientsModule', section: 'quotidien', icon: 'building' },
       { name: 'organisator', title: 'Organisator', page: 'organisator', module: 'OrganisatorModule', section: 'quotidien', icon: 'calendar' },
       { name: 'journal', title: 'Journal de bord', page: 'journal', module: 'JournalModule', section: 'quotidien', icon: 'edit' },
       { name: 'notifcenter', title: 'Alertes', page: 'notifcenter', module: 'NotifModule', section: 'quotidien', icon: 'bell' },
