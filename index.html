@@ -135,64 +135,6 @@
     </div>
 </script>
 
-<script type="text/template" id="tpl-clients">
-    <div id="page-clients">
-        <div class="page-header">
-            <div>
-                <h1>🏢 Espace Client 360</h1>
-                <p>Pilotage commercial, financier et suivi hebdomadaire</p>
-            </div>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-4" style="padding: 0 40px;">
-            <div class="card p-4 md:col-span-1" style="height: fit-content;">
-                <input type="text" id="search-client-360" oninput="ClientsModule.renderList()" placeholder="Rechercher un client..." class="input mb-4">
-                <div id="client-360-list" class="flex flex-col gap-2 overflow-y-auto" style="max-height: 60vh;"></div>
-            </div>
-
-            <div class="md:col-span-3">
-                <div id="client-360-placeholder" class="card empty-state">
-                    <div class="empty-state-icon">🏢</div>
-                    <div class="empty-state-text">Sélectionnez un client dans la liste pour voir sa fiche complète</div>
-                </div>
-
-                <div id="client-360-content" class="is-hidden">
-                    <div class="flex gap-4 mb-4" style="border-bottom: 1px solid var(--border);">
-                        <button class="btn btn-ghost active" onclick="ClientsModule.switchSubTab('suivi')" id="tab-btn-suivi" style="border-bottom: 2px solid var(--brand); border-radius: 0;">Suivi Hebdo</button>
-                        <button class="btn btn-ghost" onclick="ClientsModule.switchSubTab('stats')" id="tab-btn-stats" style="border-radius: 0;">Conso & Stats</button>
-                    </div>
-
-                    <div id="subtab-suivi">
-                        <div class="grid grid-2 gap-6">
-                            <div class="card p-4">
-                                <h3 class="card-title mb-4">✍️ Nouveau point hebdomadaire</h3>
-                                <div class="form-group">
-                                    <label class="label">Sujets en cours / Avancement</label>
-                                    <textarea id="suivi-sujets" class="textarea" placeholder="Actions réalisées cette semaine..."></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label class="label">Points d'attention / Alertes</label>
-                                    <textarea id="suivi-attention" class="textarea" placeholder="Risques, blocages, alertes..."></textarea>
-                                </div>
-                                <button class="btn btn-primary w-full" onclick="ClientsModule.addNote()">Enregistrer la note</button>
-                            </div>
-                            <div class="card p-4">
-                                <h3 class="card-title mb-4">📜 Historique</h3>
-                                <div id="suivi-history-list" class="flex flex-col gap-4 overflow-y-auto" style="max-height: 500px;"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="subtab-stats" class="is-hidden">
-                        <div class="card p-6 text-center text-muted">
-                            Les données financières (TJM, budget) et le détail du CRA pour ce client arriveront ici prochainement.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</script>
 
 <script type="text/template" id="tpl-craminator">
     <div id="page-craminator" style="display:block !important; position:relative; left:0; height:auto; overflow:visible; opacity:1;">
