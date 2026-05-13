@@ -1,5 +1,5 @@
 /**
- * assets/js/router.js - Chargement asynchrone des vues HTML
+ * ROUTER.JS - Navigation modulaire asynchrone
  */
 const Router = {
   routes: new Map(),
@@ -12,9 +12,7 @@ const Router = {
 
   init(sel = '#content') {
     this.contentEl = document.querySelector(sel);
-    window.addEventListener('popstate', () => {
-      this._loadRoute(this._hash(), false);
-    });
+    window.addEventListener('popstate', () => this._loadRoute(this._hash(), false));
     this.navigate(this._hash() || 'dashboard');
   },
 
@@ -29,7 +27,7 @@ const Router = {
     const route = this.routes.get(name);
     if (!route) return;
 
-    // 1. Détruire les graphiques du module précédent (évite les plantages)
+    // 1. Destruction propre des instances du module précédent (ex: Chart.js)
     if (this.currentRoute) {
       const prevRoute = this.routes.get(this.currentRoute);
       if (prevRoute && prevRoute.module && window[prevRoute.module]?.destroy) {
@@ -37,38 +35,28 @@ const Router = {
       }
     }
 
-    // 2. Charger le HTML depuis le dossier pages/
+    // 2. Fetch du HTML depuis GitHub Pages
     try {
       const response = await fetch('pages/' + route.page + '.html');
-      if (!response.ok) throw new Error(response.statusText);
+      if (!response.ok) throw new Error("Fichier introuvable");
       this.contentEl.innerHTML = await response.text();
     } catch (error) {
-      console.error("Erreur de chargement de la page :", error);
-      this.contentEl.innerHTML = `
-        <div style="padding:40px;text-align:center;">
-            <h2 style="color:var(--danger);font-size:24px;margin-bottom:12px;">Erreur de chargement</h2>
-            <p style="color:var(--ink-secondary);">Impossible de charger le fichier <b>pages/${route.page}.html</b>.</p>
-            <div style="background:var(--warn-soft);padding:16px;border-radius:8px;margin-top:20px;display:inline-block;text-align:left;">
-                <strong>⚠️ Avez-vous ouvert ce fichier avec un double-clic ?</strong><br>
-                Si l'URL de votre navigateur commence par <code>file:///</code>, le chargement est bloqué par sécurité.<br>
-                Vous devez impérativement utiliser un Serveur Local (ex: Live Server).
-            </div>
-        </div>`;
+      this.contentEl.innerHTML = `<div style="padding:40px;color:red;">Erreur: impossible de charger pages/${route.page}.html</div>`;
     }
 
     this.currentRoute = name;
 
-    // 3. Surligner le menu actif
+    // Mise à jour de la classe CSS active dans le menu
     document.querySelectorAll('.nav-item').forEach(b => {
       b.classList.toggle('active', b.getAttribute('data-route') === name);
     });
 
     if (push) window.history.pushState(null, '', '#/' + name);
 
-    // 4. Lancer l'initialisation Javascript du module métier
+    // 3. Initialisation du module JS lié à la page
     setTimeout(async () => {
-      if (route.module && window[route.module] && typeof window[route.module].init === 'function') {
-        try { await window[route.module].init(); } catch(e) { console.error('Erreur module:', e); }
+      if (route.module && window[route.module]?.init) {
+        try { await window[route.module].init(); } catch(e) { console.error('Erreur init:', e); }
       }
     }, 50);
   }
