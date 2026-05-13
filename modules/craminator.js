@@ -1,50 +1,38 @@
 /**
- * MODULE CRAMINATOR - Analyse d'exports Excel
+ * MODULE CRAMINATOR - Version Complète (5 Graphiques)
  */
 const CRAModule = {
     charts: {},
     rawData: [],
+    // Simulation de TJM par défaut (à configurer dans la page config plus tard)
+    defaultTJM: 600, 
 
-    // Appelée par le menu quand on clique sur "CRAminator"
     init() {
-        console.log("📊 CRAModule init()");
-        
-        // 1. Récupération des données locales (si elles existent déjà)
+        console.log("📊 CRAModule Full Init");
         const sources = Storage.get('cra_data_sources', {});
         this.rawData = [];
         Object.values(sources).forEach(src => {
             if (src.data) this.rawData = this.rawData.concat(src.data);
         });
 
-        // 2. Gestion de l'affichage
         const uploadSec = document.getElementById('upload-section');
         const dashSec = document.getElementById('dashboard-section');
 
         if (this.rawData.length > 0) {
-            // On a des données : on cache l'upload et on affiche le dashboard
             if (uploadSec) uploadSec.style.display = 'none';
             if (dashSec) dashSec.style.display = 'block';
-            
-            // On dessine les graphiques
-            this.updateDashboard();
+            // On attend que le DOM soit rendu pour dessiner
+            setTimeout(() => this.updateDashboard(), 100);
         } else {
-            // Aucune donnée : on affiche l'upload
             if (uploadSec) uploadSec.style.display = 'block';
             if (dashSec) dashSec.style.display = 'none';
         }
     },
 
-    // Déclenchée quand on choisit un fichier Excel
     handleFiles(event) {
         const files = Array.from(event.target.files);
         if (!files.length) return;
 
-        if (typeof XLSX === 'undefined') {
-            alert("La librairie Excel n'est pas chargée !");
-            return;
-        }
-
-        console.log(`Lecture de ${files.length} fichier(s)...`);
         const dataSources = Storage.get('cra_data_sources', {});
         let processed = 0;
 
@@ -57,7 +45,6 @@ const CRAModule = {
                     
                     const parsed = [];
                     json.forEach(row => {
-                        // Cherche les colonnes intelligemment
                         const getVal = (names) => {
                             const key = Object.keys(row).find(k => names.includes(k.toLowerCase().trim()));
                             return key ? row[key] : null;
@@ -67,116 +54,123 @@ const CRAModule = {
                         const j = parseFloat(String(jRaw).replace(',', '.'));
 
                         if (j > 0) {
+                            // Extraction de la date pour le graphique temporel
+                            let rawDate = getVal(['date', 'jour', 'période']);
+                            let dateObj = this.parseExcelDate(rawDate);
+
                             parsed.push({
                                 client: String(getVal(['client', 'project', 'projet']) || "N/A").trim(),
                                 collaborateur: String(getVal(['collaborateur', 'consultant', 'nom']) || "N/A").trim(),
                                 jours: j,
-                                tache: String(getVal(['tâche', 'tache', 'task', 'activité']) || "").trim()
+                                tache: String(getVal(['tâche', 'tache', 'task', 'activité']) || "Autre").trim(),
+                                date: dateObj ? dateObj.toISOString().split('T')[0] : null,
+                                moisStr: dateObj ? `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}` : "Inconnu"
                             });
                         }
                     });
 
                     if (parsed.length > 0) {
-                        const id = 'src_' + Date.now();
-                        dataSources[id] = { name: file.name, data: parsed };
-                    } else {
-                        alert(`Le fichier ${file.name} semble vide ou invalide (colonnes non reconnues).`);
+                        dataSources['src_' + Date.now()] = { name: file.name, data: parsed };
                     }
-                } catch(err) { 
-                    console.error("Erreur de lecture Excel", err); 
-                }
+                } catch(err) { console.error("Erreur Excel", err); }
 
                 processed++;
                 if (processed === files.length) {
-                    // Sauvegarde et rechargement de l'interface
                     Storage.set('cra_data_sources', dataSources);
                     this.init();
                 }
             };
             reader.readAsArrayBuffer(file);
         });
-        
-        // Reset de l'input pour pouvoir re-sélectionner le même fichier si besoin
         event.target.value = '';
     },
 
-    clearData() {
-        if (!confirm("Voulez-vous effacer toutes les données du CRAminator ?")) return;
-        Storage.set('cra_data_sources', {});
-        this.init();
-    },
-
-    switchTab(tab) {
-        const dashContent = document.getElementById('dashboard-content');
-        const explContent = document.getElementById('explorer-content');
-        const btnDash = document.getElementById('btn-tab-dashboard');
-        const btnExpl = document.getElementById('btn-tab-explorer');
-
-        if (tab === 'dashboard') {
-            dashContent.style.display = 'grid';
-            explContent.style.display = 'none';
-            btnDash.style.background = 'var(--brand)';
-            btnDash.style.color = 'white';
-            btnDash.style.border = 'none';
-            btnExpl.style.background = 'transparent';
-            btnExpl.style.color = 'var(--ink)';
-            btnExpl.style.border = '1px solid var(--border)';
-        } else {
-            dashContent.style.display = 'none';
-            explContent.style.display = 'block';
-            btnExpl.style.background = 'var(--brand)';
-            btnExpl.style.color = 'white';
-            btnExpl.style.border = 'none';
-            btnDash.style.background = 'transparent';
-            btnDash.style.color = 'var(--ink)';
-            btnDash.style.border = '1px solid var(--border)';
-            this.renderExplorer();
+    // Utilitaire pour lire les dates Excel (numériques ou string)
+    parseExcelDate(val) {
+        if (!val) return null;
+        if (typeof val === 'number') return new Date((val - 25569) * 86400 * 1000);
+        if (typeof val === 'string') {
+            const parts = val.split(/[-/]/);
+            if (parts.length === 3) return new Date(parts[2], parts[1]-1, parts[0]);
         }
+        return null;
     },
 
     updateDashboard() {
         if (typeof Chart === 'undefined') return;
 
-        // Fonction d'agrégation (Somme des jours)
-        const agg = (k) => {
+        const colors = ['#1B3B5C', '#5EB091', '#E9BD27', '#E75B3C', '#4491B6', '#94A3B8'];
+
+        // 1. Agrégations simples
+        const sumBy = (key) => {
             const m = {};
-            this.rawData.forEach(r => { if(!m[r[k]]) m[r[k]]=0; m[r[k]]+=r.jours; });
+            this.rawData.forEach(r => { if(!m[r[key]]) m[r[key]]=0; m[r[key]]+=r.jours; });
             return Object.entries(m).map(([name, value]) => ({name, value})).sort((a,b)=>b.value-a.value);
         };
 
-        const bgColors = ['#1B3B5C', '#5EB091', '#E9BD27', '#E75B3C', '#4491B6'];
-
-        const draw = (id, data, type) => {
+        const draw = (id, data, type, options = {}) => {
             const canvas = document.getElementById(id);
             if (!canvas) return;
-            
-            // Destruction de l'ancien graphe pour éviter le bug Chart.js
             if (this.charts[id]) this.charts[id].destroy();
-            
             this.charts[id] = new Chart(canvas.getContext('2d'), {
                 type: type,
                 data: { 
                     labels: data.map(d=>d.name), 
-                    datasets: [{ data: data.map(d=>d.value), backgroundColor: bgColors }] 
+                    datasets: [{ data: data.map(d=>d.value), backgroundColor: colors, borderRadius: 5 }] 
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: { responsive: true, maintainAspectRatio: false, ...options }
             });
         };
 
-        draw('clientChart', agg('client'), 'bar');
-        draw('taskChart', agg('tache'), 'doughnut');
+        draw('collabChart', sumBy('collaborateur'), 'bar');
+        draw('clientChart', sumBy('client'), 'bar');
+        draw('taskChart', sumBy('tache'), 'doughnut');
+
+        // 2. Graphique Temporel (Évolution)
+        const timeData = {};
+        this.rawData.forEach(r => {
+            if(r.moisStr === "Inconnu") return;
+            if(!timeData[r.moisStr]) timeData[r.moisStr] = 0;
+            timeData[r.moisStr] += r.jours;
+        });
+        const sortedTime = Object.entries(timeData).sort().map(([name, value]) => ({name, value}));
+        draw('timeChart', sortedTime, 'line', { tension: 0.4, fill: true, backgroundColor: 'rgba(94, 176, 145, 0.1)' });
+
+        // 3. Graphique CA (Chiffre d'affaires estimé)
+        // On récupère les TJM personnalisés s'ils existent, sinon defaultTJM
+        const tjmSettings = Storage.get('cra_tjm', {});
+        const caData = {};
+        this.rawData.forEach(r => {
+            const tjm = tjmSettings[r.client] || this.defaultTJM;
+            if(!caData[r.client]) caData[r.client] = 0;
+            caData[r.client] += r.jours * tjm;
+        });
+        const sortedCA = Object.entries(caData).map(([name, value]) => ({name, value})).sort((a,b)=>b.value-a.value);
+        draw('caChart', sortedCA, 'bar', { indexAxis: 'y' });
+    },
+
+    clearData() {
+        if (confirm("Effacer toutes les données ?")) {
+            Storage.set('cra_data_sources', {});
+            this.init();
+        }
+    },
+
+    switchTab(tab) {
+        document.getElementById('dashboard-content').style.display = tab === 'dashboard' ? 'flex' : 'none';
+        document.getElementById('explorer-content').style.display = tab === 'explorer' ? 'block' : 'none';
+        if(tab === 'explorer') this.renderExplorer();
     },
 
     renderExplorer() {
         const tbody = document.getElementById('explorer-table-body');
         if (!tbody) return;
-        
-        tbody.innerHTML = this.rawData.slice(0, 200).map(d => `
+        tbody.innerHTML = this.rawData.slice(0, 100).map(d => `
             <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding:10px; font-weight:600; color:var(--primary);">${d.client}</td>
-                <td style="padding:10px;">${d.collaborateur}</td>
-                <td style="padding:10px; font-weight:bold; color:var(--brand);">${d.jours.toFixed(2)}</td>
-                <td style="padding:10px;">${d.tache}</td>
+                <td style="padding:8px;">${d.client}</td>
+                <td style="padding:8px;">${d.collaborateur}</td>
+                <td style="padding:8px; font-weight:bold; color:var(--brand);">${d.jours.toFixed(2)}</td>
+                <td style="padding:8px; font-size:11px;">${d.tache}</td>
             </tr>
         `).join('');
     }
