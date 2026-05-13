@@ -1,99 +1,74 @@
 /**
- * assets/js/router.js - Gestionnaire de navigation asynchrone
+ * ROUTER.JS — Compatible file:// (templates inline) ET http:// (fetch)
  */
 const Router = {
   routes: new Map(),
   currentRoute: null,
   contentEl: null,
 
-  /**
-   * Enregistre une nouvelle route
-   */
   register(name, config) {
     this.routes.set(name, {
-      name,
-      title: config.title || name,
-      page: config.page,
-      module: config.module
+      name, title: config.title || name, subtitle: config.subtitle || '',
+      icon: config.icon || '', page: config.page, module: config.module,
     });
   },
 
-  /**
-   * Initialise le routeur
-   */
   init(sel = '#content') {
     this.contentEl = document.querySelector(sel);
-    if (!this.contentEl) return console.error("Élément de contenu introuvable");
-
-    window.addEventListener('popstate', () => {
-      this._loadRoute(this._hash(), false);
+    window.addEventListener('popstate', (e) => {
+      this._loadRoute(e.state?.route || this._hash(), false);
     });
-
     this.navigate(this._hash() || 'dashboard');
   },
 
-  _hash() {
-    return window.location.hash.replace('#/', '').replace('#', '') || null;
-  },
+  _hash() { return window.location.hash.replace('#/', '').replace('#', '') || null; },
 
-  /**
-   * Navigue vers une page
-   */
   async navigate(name) {
     if (!this.routes.has(name)) name = 'dashboard';
     await this._loadRoute(name, true);
   },
 
-  /**
-   * Charge le contenu et initialise le module associé
-   */
   async _loadRoute(name, push) {
     const route = this.routes.get(name);
     if (!route) return;
 
-    // 1. Nettoyage du module précédent (Détruit les instances de graphiques)
+    // Destroy previous module if it has a destroy method
     if (this.currentRoute) {
-      const prevRoute = this.routes.get(this.currentRoute);
-      if (prevRoute && prevRoute.module && window[prevRoute.module] && typeof window[prevRoute.module].destroy === 'function') {
-        window[prevRoute.module].destroy();
+      const prev = this.routes.get(this.currentRoute);
+      if (prev?.module && window[prev.module]?.destroy) {
+        try { window[prev.module].destroy(); } catch(e) {}
       }
     }
 
-    // 2. Chargement du HTML (Priorité aux templates inline, puis fetch)
+    // 1. Template inline (file://) — prioritaire
     const tpl = document.getElementById('tpl-' + route.page);
     if (tpl) {
       this.contentEl.innerHTML = tpl.innerHTML;
     } else {
+      // 2. Fetch (http://)
       try {
-        const response = await fetch('pages/' + route.page + '.html');
-        if (!response.ok) throw new Error(response.statusText);
-        this.contentEl.innerHTML = await response.text();
-      } catch (error) {
-        this.contentEl.innerHTML = `
-          <div style="padding:40px;text-align:center;">
-              <h2 style="color:var(--danger);">Erreur de chargement</h2>
-              <p>Impossible de charger <b>pages/${route.page}.html</b>.</p>
-          </div>`;
+        const r = await fetch('pages/' + route.page + '.html');
+        if (!r.ok) throw new Error(r.status);
+        this.contentEl.innerHTML = await r.text();
+      } catch (e) {
+        this.contentEl.innerHTML = '<div style="padding:40px;color:var(--danger);">Erreur: impossible de charger ' + route.page + ' (' + e.message + '). Utilisez un serveur HTTP local.</div>';
       }
     }
 
     this.currentRoute = name;
-
-    // 3. Mise à jour visuelle du menu
-    document.querySelectorAll('.nav-item').forEach(el => {
-      el.classList.toggle('active', el.dataset.route === name);
+    // Highlight nav
+    document.querySelectorAll('.nav-item[data-route]').forEach(b => {
+      b.classList.toggle('active', b.dataset.route === name);
     });
-
-    if (push) window.history.pushState({ route: name }, route.title, '#/' + name);
+    if (push) window.history.pushState({route: name}, route.title, '#/' + name);
     document.title = route.title + ' — Cyrias Buddy';
 
-    // 4. Initialisation du module métier
-    setTimeout(async () => {
-      if (route.module && window[route.module] && typeof window[route.module].init === 'function') {
-        try { await window[route.module].init(); } catch (e) { console.error(`Erreur d'initialisation du module ${route.module}:`, e); }
-      }
-    }, 50);
-  }
-};
+    // Init module
+    if (route.module && window[route.module]?.init) {
+      try { await window[route.module].init(); } catch(e) { console.error('[Router]', e); }
+    }
+  },
 
+  getCurrentRoute() { return this.currentRoute; }
+};
 window.Router = Router;
