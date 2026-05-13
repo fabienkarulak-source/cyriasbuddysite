@@ -102,12 +102,48 @@
             <div class="card" style="margin-top: 20px;">Contenu du module Client bientôt chargé...</div>
         </div>
 
-        <div id="page-craminator" class="page">
-            <h1>📊 CRAminator</h1>
-            <div id="cra-upload-zone" class="card" style="margin-top: 20px; border: 2px dashed var(--brand); text-align: center; padding: 60px;">
-                <p>Déposez vos exports Stafiz ici ou</p>
-                <button class="nav-item" style="display: inline-block; width: auto; background: var(--brand); color: white; margin-top: 15px;">Parcourir les fichiers</button>
-                <input type="file" id="cra-file-input" class="is-hidden" multiple>
+       <div id="page-craminator" class="page">
+            <h1 style="font-family: 'Outfit'; margin-bottom: 24px;">📊 CRAminator</h1>
+            
+            <div id="upload-section" class="card" style="border: 2px dashed var(--brand); text-align: center; padding: 60px;">
+                <p style="margin-bottom: 15px; color: var(--ink-muted);">Déposez vos exports Excel Stafiz ici ou</p>
+                <label style="display: inline-block; padding: 10px 20px; background: var(--brand); color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                    Parcourir les fichiers
+                    <input type="file" style="display: none;" accept=".xlsx,.xls,.csv" multiple onchange="CRAModule.handleFiles(event)">
+                </label>
+            </div>
+
+            <div id="dashboard-section" style="display: none; margin-top: 20px;">
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button onclick="CRAModule.switchTab('dashboard')" id="btn-tab-dashboard" style="padding: 8px 16px; background: var(--brand); color: white; border: none; border-radius: 6px; cursor: pointer;">Dashboard</button>
+                    <button onclick="CRAModule.switchTab('explorer')" id="btn-tab-explorer" style="padding: 8px 16px; background: transparent; border: 1px solid var(--border); border-radius: 6px; cursor: pointer;">Explorateur</button>
+                    <button onclick="CRAModule.clearData()" style="padding: 8px 16px; background: #fee2e2; color: #ef4444; border: none; border-radius: 6px; cursor: pointer; margin-left: auto;">Tout effacer</button>
+                </div>
+
+                <div id="dashboard-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="card">
+                        <h3 style="margin-bottom: 15px;">Jours par Client</h3>
+                        <div style="height: 300px; position: relative;"><canvas id="clientChart"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <h3 style="margin-bottom: 15px;">Répartition par Tâche</h3>
+                        <div style="height: 300px; position: relative;"><canvas id="taskChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div id="explorer-content" class="card" style="display: none;">
+                    <table style="width: 100%; text-align: left; border-collapse: collapse; font-size: 13px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border);">
+                                <th style="padding: 10px;">Client</th>
+                                <th style="padding: 10px;">Collaborateur</th>
+                                <th style="padding: 10px; color: var(--brand);">Jours</th>
+                                <th style="padding: 10px;">Tâche</th>
+                            </tr>
+                        </thead>
+                        <tbody id="explorer-table-body"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>
