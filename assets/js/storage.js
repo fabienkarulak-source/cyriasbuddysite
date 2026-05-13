@@ -3,9 +3,9 @@
  */
 const GitHubDB = {
   config: {
-    token: 'github_pat_VOTRE_TOKEN_ICI', // ⚠️ Token GitHub
-    owner: 'VotrePseudo',                // ⚠️ Ton pseudo GitHub
-    repo: 'nom-du-repo-data',            // ⚠️ Le repo qui stocke le json
+    token: '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', // ⚠️ Token GitHub
+    owner: 'fabienkarulak-source',                // ⚠️ Ton pseudo GitHub
+    repo: 'cyriasbuddysite',            // ⚠️ Le repo qui stocke le json
     path: 'cyrias-db.json',
     sha: null
   },
