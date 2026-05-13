@@ -4,11 +4,8 @@
 const App = {
     init() {
         this.setupEvents();
-        // Lancer sur la page d'accueil
+        // Lancer sur la page d'accueil au démarrage
         this.navigateTo('dashboard');
-        
-        // Initialiser les modules métiers
-        if (window.CRAModule) CRAModule.init();
     },
 
     setupEvents() {
@@ -19,7 +16,7 @@ const App = {
             localStorage.setItem('cyrias_app_theme', JSON.stringify(next));
         });
 
-        // Gestion de l'état réduit/étendu de la sidebar
+        // Gestion de l'état de la sidebar
         const sbState = localStorage.getItem('cyrias_sidebar_state');
         if (sbState === '"collapsed"') {
             document.querySelector('.sidebar').classList.add('collapsed');
@@ -40,39 +37,32 @@ const App = {
     },
 
     navigateTo(page) {
-        // 1. Mettre à jour le bouton actif dans le menu
+        // 1. Mettre à jour la couleur du bouton actif dans le menu
         document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
         const activeBtn = document.querySelector(`.nav-item[onclick*="${page}"]`);
         if (activeBtn) activeBtn.classList.add('active');
 
-        // 2. Afficher la bonne page HTML (La magie de la v23 originale)
+        // 2. Afficher la bonne page et cacher les autres (Proprement)
         document.querySelectorAll('.page').forEach(p => {
             if (p.id === 'page-' + page) {
                 p.classList.add('active');
+                p.style.display = 'block'; // On s'assure qu'elle est visible
                 
-                // Hack spécifique au CRAminator pour que les graphes s'affichent correctement
-                if (p.id === 'page-craminator') {
-                    p.style.position = 'relative';
-                    p.style.left = '0';
-                    p.style.height = 'auto';
-                    p.style.opacity = '1';
-                    p.style.pointerEvents = 'auto';
-                } else {
-                    p.style.display = 'block';
-                }
+                // Nettoyage des vieux styles "hack" s'ils sont restés bloqués
+                p.style.opacity = '1';
+                p.style.position = 'relative';
+                p.style.left = '0';
+                p.style.height = 'auto';
             } else {
-                if (p.id === 'page-craminator') {
-                    p.style.position = 'absolute';
-                    p.style.left = '-99999px';
-                    p.style.height = '0';
-                    p.style.opacity = '0';
-                    p.style.pointerEvents = 'none';
-                } else {
-                    p.style.display = 'none';
-                    p.classList.remove('active');
-                }
+                p.classList.remove('active');
+                p.style.display = 'none'; // On cache les autres
             }
         });
+
+        // 3. Relancer la logique du module concerné
+        if (page === 'craminator' && window.CRAModule) {
+            CRAModule.init(); // Redessine les graphiques correctement
+        }
     }
 };
 
