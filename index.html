@@ -42,6 +42,32 @@
         /* UTILS */
         .is-hidden { display: none !important; }
         .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+   /* TOOLBAR CRAMINATOR (Design Image) */
+        .toolbar-container { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+        .btn-tool { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; color: #475569; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.02); font-family: 'Inter', sans-serif; }
+        .btn-tool:hover { background: #f8fafc; border-color: #cbd5e1; color: #1e293b; }
+        .btn-tool svg { width: 14px; height: 14px; opacity: 0.7; stroke-width: 2.5; }
+        
+        /* Bouton Actif (Bleu Marine foncé) */
+        .btn-tool.active { background: #2A3B52; border-color: #2A3B52; color: #ffffff; }
+        .btn-tool.active svg { opacity: 1; stroke: #ffffff; }
+        
+        /* Couleurs Spécifiques */
+        .btn-tool.outline-blue { color: #38bdf8; border-color: #bae6fd; }
+        .btn-tool.outline-blue svg { stroke: #38bdf8; opacity: 1; }
+        .btn-tool.outline-green { color: #22c55e; border-color: #bbf7d0; }
+        .btn-tool.outline-green svg { stroke: #22c55e; opacity: 1; }
+        .btn-tool.outline-yellow { color: #eab308; border-color: #fef08a; }
+        .btn-tool.outline-yellow svg { stroke: #eab308; opacity: 1; }
+        
+        /* Séparateurs et Badges */
+        .tool-divider { width: 1px; height: 24px; background: #e2e8f0; margin: 0 4px; }
+        .tool-spacer { flex-grow: 1; } /* Pousse les éléments suivants à droite */
+        .tool-badge { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; display: flex; align-items: center; justify-content: center; }
+        .tool-badge.gray { background: #f8fafc; color: #94a3b8; }
+        .tool-badge.green { background: #f0fdf4; color: #22c55e; border: 1px solid #bbf7d0; }
+    
+    
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
