@@ -114,14 +114,18 @@
 </div>
 
 <script>
-    const Portal = {
+   const Portal = {
         go(pageId) {
             console.log("Navigation vers :", pageId);
             
-            // 1. Boutons du menu
+            // 1. Boutons du menu (avec sécurité anti-crash)
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.classList.remove('active');
-                if(btn.getAttribute('onclick').includes(pageId)) btn.classList.add('active');
+                const onClickAttr = btn.getAttribute('onclick');
+                // On vérifie que onClickAttr existe bien avant de faire un .includes()
+                if(onClickAttr && onClickAttr.includes(pageId)) {
+                    btn.classList.add('active');
+                }
             });
 
             // 2. Affichage des pages
